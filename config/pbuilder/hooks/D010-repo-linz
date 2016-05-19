@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Ask @imincik for LINZ repository credentials !
+
+# LINZ
+if [ "$REPO" == "linz" ]; then
+    echo "REPO: adding 'linz' repository configuration"
+
+    echo "deb http://apt.postgresql.org/pub/repos/apt/ $DIST-pgdg main" \
+    > /etc/apt/sources.list.d/pgdg.list
+
+    echo "deb https://<USERNAME>:<PASSWORD>@private-ppa.launchpad.net/linz/test/ubuntu $DIST main" \
+    > /etc/apt/sources.list.d/linz.list
+fi
