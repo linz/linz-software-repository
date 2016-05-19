@@ -1,2 +1,1 @@
-# linz-software-repository
-Management of LINZ's Software Repository
+# Management of LINZ's Software Repository
