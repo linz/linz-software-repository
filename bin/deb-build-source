@@ -1,0 +1,13 @@
+#!/bin/bash
+
+gbp buildpackage \
+    -i.git -I.git \
+    --git-export-dir=build-area \
+    --git-builder=debuild \
+    --git-no-pristine-tar \
+    --git-upstream-tag='%(version)s' \
+    --git-ignore-branch \
+    --git-ignore-new \
+    -S -us -uc $@
+
+# vim: set ts=4 sts=4 sw=4 et:
