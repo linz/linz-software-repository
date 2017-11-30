@@ -22,8 +22,8 @@ $ deb-build-binary | deb-build-source
 
 ## OUT OF CONTAINER:
 ```
+$ sudo chown -rv $(id -u):$(id -u) build-area
 $ cd build-area
-$ sudo chown -v $(id -u):$(id -u) *.*
 $ debsign <PACKAGE>.changes
 ```
 
