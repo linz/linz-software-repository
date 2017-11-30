@@ -1,6 +1,0 @@
-#!/bin/bash
-
-if [ -n "$APT_PROXY" ]; then
-    echo "Acquire::http::Proxy \"$APT_PROXY\";" > /etc/apt/apt.conf.d/02proxy
-    echo "Acquire::https::Proxy "false";" >> /etc/apt/apt.conf.d/02proxy
-fi
