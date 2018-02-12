@@ -23,6 +23,9 @@ RUN apt-get install -y \
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" \
     > /etc/apt/sources.list.d/pgdg.list
 
+RUN echo "deb https://packagecloud.io/linz/test/ubuntu/ $(lsb_release -cs) main" \
+    > /etc/apt/sources.list.d/linz-prod.list
+
 RUN echo "deb https://packagecloud.io/linz/prod/ubuntu/ $(lsb_release -cs) main" \
     > /etc/apt/sources.list.d/linz-prod.list
 
