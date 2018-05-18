@@ -11,7 +11,8 @@
 #
 ################################################################################
 
-FROM ubuntu:14.04
+FROM ubuntu:DISTRIBUTION  # Replace DISTRIBUTION with required Ubuntu
+                          # distribution number (14.04, 16.04, ...)
 
 ENV DEBIAN_FRONTEND noninteractive
 
