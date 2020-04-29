@@ -1,4 +1,4 @@
-DISTRIBUTION ?= latest
+DISTRIBUTION ?= bionic
 
 .PHONY: help
 help:
@@ -12,4 +12,4 @@ help:
 
 .PHONY: image
 image: ## Build the docker image, tweak by DISTRIBUTION env (ie: DISTRIBUTION=18.04 make deb-builder)
-	docker build --build-arg DISTRIBUTION=${DISTRIBUTION} --rm --tag deb-builder:${DISTRIBUTION} .
+	docker build --build-arg DISTRIBUTION=${DISTRIBUTION} --rm --tag linz-deb-builder:${DISTRIBUTION} .
