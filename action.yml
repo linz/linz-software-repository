@@ -1,0 +1,20 @@
+# action.yml
+# See
+# https://help.github.com/en/actions/building-actions/creating-a-docker-container-action
+
+name: 'LINZ Debian Packaging'
+description: 'Build Debian packages for LINZ software repository'
+inputs:
+  repo:
+    description: 'Path to source repository of project to build packages of'
+    required: false
+    default: '/github/workspace'
+#outputs:
+#  time: # id of output
+#    description: 'time of docker start'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.repo }}
+

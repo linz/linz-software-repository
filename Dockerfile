@@ -12,7 +12,7 @@
 ################################################################################
 
 # Pass via env, like: docker build --build-arg DISTRIBUTION=18.04 ...
-ARG  DISTRIBUTION=latest
+ARG  DISTRIBUTION=bionic
 FROM ubuntu:${DISTRIBUTION}
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -50,4 +50,6 @@ RUN echo "DEBIAN_FRONTEND=noninteractive" >> /etc/environment
 ADD bin/* /usr/local/bin/
 RUN chmod 755 /usr/local/bin/*
 
-ENTRYPOINT /bin/bash
+COPY entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT [ "/entrypoint.sh" ]
