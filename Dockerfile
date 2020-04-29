@@ -2,7 +2,7 @@
 
 ################################################################################
 #
-# Copyright 2013-2019 Crown copyright (c)
+# Copyright 2013-2020 Crown copyright (c)
 # Land Information New Zealand and the New Zealand Government.
 # All rights reserved
 #
@@ -11,9 +11,9 @@
 #
 ################################################################################
 
-# Replace DISTRIBUTION with required Ubuntu
-# distribution number (14.04, 16.04, ...)
-FROM ubuntu:DISTRIBUTION
+# Pass via env, like: docker build --build-arg DISTRIBUTION=18.04 ...
+ARG  DISTRIBUTION=latest
+FROM ubuntu:${DISTRIBUTION}
 
 ENV DEBIAN_FRONTEND noninteractive
 
