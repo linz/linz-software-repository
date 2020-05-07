@@ -17,6 +17,8 @@ cd ${SRCDIR} || {
   exit 1
 }
 
+PATH=$PATH:/usr/local/sbin:/usr/sbin:/sbin:
+
 echo "------------------------------"
 echo "Running deb-build-dependencies"
 echo "------------------------------"
