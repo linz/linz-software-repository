@@ -1,13 +1,13 @@
 #!/bin/bash
 
-echo "----------------------------------"
+echo "----------------------------------------------------"
 echo "LINZ Software Packaging system"
 echo 
 echo "Arguments: $@"
 echo
 echo "Supported Arguments:"
-echo "   <srcdir> dir containing source"
-echo "----------------------------------"
+echo "   <srcdir> dir containing source (defaults to /pkg)"
+echo "----------------------------------------------------"
 echo
 
 
@@ -23,6 +23,18 @@ echo "------------------------------"
 echo "Running deb-build-dependencies"
 echo "------------------------------"
 deb-build-dependencies || exit 1
+
+echo "------------------------------"
+echo "Updating Debian changelog"
+echo "------------------------------"
+msg="New upstream version" #TODO: tweak this (take as param?)
+tag=$(git describe --tags --exclude 'debian/*')
+pkgser=1 #package serial -- TODO: tweak this (take as param?)
+dist=$(lsb_release -cs)
+dch -D ${dist} -v \
+  "${tag}-${pkgser}linz~${dist}1" \
+  $msg \
+  || exit 1
 
 echo "------------------------------"
 echo "Running deb-build-binary"
