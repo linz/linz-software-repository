@@ -27,14 +27,28 @@ deb-build-dependencies || exit 1
 echo "------------------------------"
 echo "Updating Debian changelog"
 echo "------------------------------"
+
+LAST_COMMITTER_NAME=$(git --no-pager show -s --format='%cn' HEAD)
+LAST_COMMITTER_EMAIL=$(git --no-pager show -s --format='%ce' HEAD)
+
+export DEBFULLNAME="${LAST_COMMITTER_NAME}"
+export DEBEMAIL="${LAST_COMMITTER_EMAIL}"
+
+git config --global user.email "${LAST_COMMITTER_NAME}"
+git config --global user.name "${LAST_COMMITTER_EMAIL}"
+
 msg="New upstream version" #TODO: tweak this (take as param?)
 tag=$(git describe --tags --exclude 'debian/*')
-pkgser=1 #package serial -- TODO: tweak this (take as param?)
 dist=$(lsb_release -cs)
-dch -D ${dist} -v \
-  "${tag}-${pkgser}linz~${dist}1" \
-  $msg \
-  || exit 1
+version="${tag}-linz~${dist}1"
+
+echo "Using version: $version"
+
+dch -D ${dist} -v "${version}" "$msg" || exit 1
+
+git diff
+
+git commit -m "[debian] Changelog update" debian/changelog || exit 1
 
 echo "------------------------------"
 echo "Running deb-build-binary"
