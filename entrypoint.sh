@@ -20,11 +20,6 @@ cd ${SRCDIR} || {
 PATH=$PATH:/usr/local/sbin:/usr/sbin:/sbin:
 
 echo "------------------------------"
-echo "Running deb-build-dependencies"
-echo "------------------------------"
-deb-build-dependencies || exit 1
-
-echo "------------------------------"
 echo "Updating Debian changelog"
 echo "------------------------------"
 
@@ -43,6 +38,13 @@ dist=$(lsb_release -cs)
 version="${tag}-linz~${dist}1"
 
 echo "Using version: $version"
+echo "Hostname: ${HOSTNAME}"
+
+TMPBRANCH=pkg-dev-${HOSTNAME}
+
+git checkout -b ${TMPBRANCH} || exit 1
+
+trap 'git checkout -' 0
 
 dch -D ${dist} -v "${version}" "$msg" || exit 1
 
@@ -51,11 +53,18 @@ git diff
 git commit -m "[debian] Changelog update" debian/changelog || exit 1
 
 echo "------------------------------"
+echo "Running deb-build-dependencies"
+echo "------------------------------"
+deb-build-dependencies || exit 1
+
+echo "------------------------------"
 echo "Running deb-build-binary"
 echo "------------------------------"
 deb-build-binary || exit 1
 
 echo "-------------------------------------"
 echo "Packages should now be in build-area/"
+echo
+echo "You can delete the ${TMPBRANCH} branch"
 echo "-------------------------------------"
 
