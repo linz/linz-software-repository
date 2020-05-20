@@ -1,0 +1,11 @@
+on: [push, pull_request]
+
+jobs:
+
+  test:
+    name: Test image building
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build image
+      run: make image
