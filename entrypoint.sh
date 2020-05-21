@@ -79,5 +79,8 @@ if test -n "${PUBLISH_TO_REPOSITORY}"; then
       ;;
   esac
   BASE="linz/${REPO}/ubuntu/${dist}"
+  echo "-------------------------------------"
+  echo "Publishing packages to ${BASE}"
+  echo "-------------------------------------"
   package_cloud push ${BASE} build-area/*.deb
 fi
