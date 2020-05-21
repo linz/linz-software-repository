@@ -9,6 +9,13 @@ inputs:
     description: 'Path to source repository of project to build packages of'
     required: false
     default: '/github/workspace'
+  packagecloud_token:
+    description: 'Package Cloud API Token'
+    required: false
+  publish_to_repository:
+    description: 'Package Cloud repository to publish to (dev|test)'
+    required: false
+    default: ''
 #outputs:
 #  time: # id of output
 #    description: 'time of docker start'
@@ -17,4 +24,7 @@ runs:
   image: 'Dockerfile'
   args:
     - ${{ inputs.repo }}
+  env:
+    PACKAGECLOUD_TOKEN: '${{ inputs.packagecloud_token }}'
+    PUBLISH_TO_REPOSITORY: '${{ inputs.publish_to_repository }}'
 

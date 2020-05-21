@@ -68,3 +68,16 @@ echo
 echo "You can delete the ${TMPBRANCH} branch"
 echo "-------------------------------------"
 
+if test -n "${PUBLISH_TO_REPOSITORY}"; then
+  REPO="${PUBLISH_TO_REPOSITORY}"
+  case "${REPO}" in
+    dev|test)
+      ;;
+    *)
+      echo "Invalid target linz repository ${REPO} (must be 'dev' or 'test')" >&2
+      exit 1
+      ;;
+  esac
+  BASE="linz/${REPO}/ubuntu/${dist}"
+  package_cloud push ${BASE} build-area/*.deb
+fi
