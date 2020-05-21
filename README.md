@@ -1,3 +1,5 @@
+[![Actions Status](https://github.com/linz/linz-software-repository/workflows/CI/badge.svg?branch=master)](https://github.com/linz/linz-software-repository/actions)
+
 # Management of LINZ's Software Repository
 
 The goal of this project is to offer tools to build software packages
