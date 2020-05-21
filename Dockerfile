@@ -35,15 +35,22 @@ RUN curl -s https://packagecloud.io/install/repositories/linz/test/script.deb.sh
 RUN curl -s https://packagecloud.io/install/repositories/linz/prod/script.deb.sh | bash
 
 
-RUN apt-get update
-RUN apt-get install -y \
+RUN apt-get update && apt-get install -y \
     build-essential \
     devscripts \
     equivs \
     git \
     git-buildpackage \
     make \
+    ruby-full \
     wget
+
+# Workaround for packagecloud tool bug,
+# see https://github.com/rubygems/rubygems/issues/3068#issuecomment-574775885
+RUN gem update --system 3.0.6
+RUN gem install rake
+RUN gem install package_cloud
+
 
 RUN echo "DEBIAN_FRONTEND=noninteractive" >> /etc/environment
 
