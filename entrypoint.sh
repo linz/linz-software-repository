@@ -74,6 +74,15 @@ ls -l build-area/*.deb
 #
 
 if test -n "${PUBLISH_TO_REPOSITORY}"; then
+
+  echo "--------------------------------------------------"
+  echo "Publishing packages to ${BASE}"
+  echo "--------------------------------------------------"
+
+  if test -z "${PACKAGECLOUD_TOKEN}"; then
+    echo "Cannot publish to packages without a PACKAGECLOUD_TOKEN" >&2
+    exit 1;
+  fi
   REPO="${PUBLISH_TO_REPOSITORY}"
   case "${REPO}" in
     dev|test)
@@ -84,9 +93,6 @@ if test -n "${PUBLISH_TO_REPOSITORY}"; then
       ;;
   esac
   BASE="linz/${REPO}/ubuntu/${dist}"
-  echo "--------------------------------------------------"
-  echo "Publishing packages to ${BASE}"
-  echo "--------------------------------------------------"
   package_cloud push ${BASE} build-area/*.deb
 fi
 
