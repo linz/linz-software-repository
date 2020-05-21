@@ -63,10 +63,15 @@ echo "------------------------------"
 deb-build-binary || exit 1
 
 echo "-------------------------------------"
-echo "Packages should now be in build-area/"
-echo
-echo "You can delete the ${TMPBRANCH} branch"
+echo "List packages now in build-area/"
 echo "-------------------------------------"
+
+ls -l build-area/*.deb
+
+
+#
+# Check if we need to publish
+#
 
 if test -n "${PUBLISH_TO_REPOSITORY}"; then
   REPO="${PUBLISH_TO_REPOSITORY}"
@@ -79,8 +84,13 @@ if test -n "${PUBLISH_TO_REPOSITORY}"; then
       ;;
   esac
   BASE="linz/${REPO}/ubuntu/${dist}"
-  echo "-------------------------------------"
+  echo "--------------------------------------------------"
   echo "Publishing packages to ${BASE}"
-  echo "-------------------------------------"
+  echo "--------------------------------------------------"
   package_cloud push ${BASE} build-area/*.deb
 fi
+
+echo "--------------------------------------------------"
+echo "You can now delete the ${TMPBRANCH} git branch"
+echo "--------------------------------------------------"
+
