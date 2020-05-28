@@ -33,23 +33,49 @@ Just invoke the docker container specifying where it can find the
 root source dir of the software to build packages for:
 
     # From directory of software to build:
-    docker run --rm -v $(pwd):/pkg linz-deb-builder:$DISTRIBUTION
+    docker run --rm -v $(pwd):/pkg linz-deb-builder:${DISTRIBUTION}
 
-On success, the packages will be found under the build-area/ directory
-of the source tree.
+On success, the packages will be found under the `build-area/`
+directory of the source tree.
 
 If you also want packages to be published to linz repository, pass
 packagecloud token and target repository as environment variables:
 
-    repo=dev # or "test"
+    export PUBLISH_TO_REPOSITORY=dev # or "test"
+    export PACKAGECLOUD_TOKEN # set to API token
     docker run --rm -v $(pwd):/pkg \
-           -e PUBLISH_TO_REPOSITORY=${repo} \
-           -e PACKAGECLOUD_TOKEN=${token} \
-           linz-deb-builder:$DISTRIBUTION
+           -e PUBLISH_TO_REPOSITORY \
+           -e PACKAGECLOUD_TOKEN \
+           linz-deb-builder:${DISTRIBUTION}
 
 On success, the packages will be also found on:
 
     https://packagecloud.io/linz/${repo}
+
+When `PUBLISH_TO_REPOSITORY` is set to `test`:
+
+  - Changes to `debian/changelog` are committed in a temporary branch.
+  - A debian tag is created (`debian/${tag}linz_${repo}1`).
+
+  If a remote branch containing the HEAD reference in the source tree
+  is found, or you pass a remote url/name via `PUSH_TO_GIT_REMOTE` env
+  variable, then both the tag and changes are pushed to corresponding
+  branch and remote. Example:
+
+    export PUBLISH_TO_REPOSITORY="test"
+    export PACKAGECLOUD_TOKEN # set to API token
+    export PUSH_TO_GIT_REMOTE=https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}
+    docker run --rm -v $(pwd):/pkg \
+           -e PUBLISH_TO_REPOSITORY \
+           -e PACKAGECLOUD_TOKEN \
+           -e PUSH_TO_GIT_REMOTE \
+           linz-deb-builder:${DISTRIBUTION}
+
+If no remote branch is found, you will probably want to merge the work done
+during packaging back to your working branch manually.  You can do so with
+something like the following:
+
+    git merge --ff-only ${tag} # tag is printed in output
 
 ## Use of the github action
 
@@ -59,17 +85,32 @@ For example:
 
     steps:
     - uses: actions/checkout@v1
-    - uses: linz/linz-software-repository@v1
+    - uses: linz/linz-software-repository@v3
 
-The default action only builds the packages, if you want to also
-publish them you'll need to pass appropriate parameters, like:
+The default action only builds the packages.
+
+If you want to also publish packages to packagecloud
+you'll need to pass appropriate parameters:
 
     steps:
     - uses: actions/checkout@v1
-    - uses: linz/linz-software-repository@v1
+    - uses: linz/linz-software-repository@v3
       with:
         packagecloud_token: ${{ secrets.PACKAGECLOUD_TOKEN }}
-        publish_to_repository: 'dev' # or 'test'
+        publish_to_repository: 'dev'
+
+When publishing to the 'test' repository you will also want
+to set the "origin" url to have credentials:
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Authorize pushing to remote
+      run: |
+        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}
+    - uses: linz/linz-software-repository@v3
+      with:
+        packagecloud_token: ${{ secrets.PACKAGECLOUD_TOKEN }}
+        publish_to_repository: 'test'
 
 ## More info
 

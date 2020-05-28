@@ -16,9 +16,10 @@ inputs:
     description: 'Package Cloud repository to publish to (dev|test)'
     required: false
     default: ''
-#outputs:
-#  time: # id of output
-#    description: 'time of docker start'
+  push_to_git_remote:
+    description: 'Name or URL of git remote to push changes to. If unset will be determined from containment of HEAD ref.'
+    required: false
+    default: ''
 runs:
   using: 'docker'
   image: 'Dockerfile'
@@ -27,4 +28,5 @@ runs:
   env:
     PACKAGECLOUD_TOKEN: '${{ inputs.packagecloud_token }}'
     PUBLISH_TO_REPOSITORY: '${{ inputs.publish_to_repository }}'
+    PUSH_TO_GIT_REMOTE: '${{ inputs.push_to_git_remote }}'
 
