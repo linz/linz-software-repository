@@ -99,7 +99,7 @@ For example:
 
     steps:
     - uses: actions/checkout@v1
-    - uses: linz/linz-software-repository@v3
+    - uses: linz/linz-software-repository@v4
 
 The default action only builds the packages.
 
@@ -108,7 +108,7 @@ you'll need to pass appropriate parameters:
 
     steps:
     - uses: actions/checkout@v1
-    - uses: linz/linz-software-repository@v3
+    - uses: linz/linz-software-repository@v4
       with:
         packagecloud_token: ${{ secrets.PACKAGECLOUD_TOKEN }}
         publish_to_repository: 'dev'
@@ -121,7 +121,7 @@ to set the "origin" url to have credentials:
     - name: Authorize pushing to remote
       run: |
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}
-    - uses: linz/linz-software-repository@v3
+    - uses: linz/linz-software-repository@v4
       with:
         packagecloud_token: ${{ secrets.PACKAGECLOUD_TOKEN }}
         publish_to_repository: 'test'
