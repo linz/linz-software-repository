@@ -1,5 +1,13 @@
 #!/bin/bash
 
+printurl() {
+  if test -n "$1"; then
+    echo "$1" | printurl
+  else
+    sed 's|://[^:]*:[^@]*@|://<redacted>@|'
+  fi
+}
+
 echo "----------------------------------------------------"
 echo "LINZ Software Packaging system"
 echo 
@@ -15,7 +23,7 @@ echo "      Can be 'test', 'dev' or empty (default)"
 echo "      for not publishing them at all."
 echo "      Targetting 'test' also creates a debian tag"
 echo "      and pushes changes to determined git remote"
-echo "   PUSH_TO_GIT_REMOTE [${PUSH_TO_GIT_REMOTE}]"
+echo "   PUSH_TO_GIT_REMOTE [$(printurl ${PUSH_TO_GIT_REMOTE})]"
 echo "      Git remote name or URL to push debian tag and"
 echo "      changes to, if PUBLISH_TO_REPOSITORY=test."
 echo "      Defaults to the remotes containing HEAD ref."
@@ -214,26 +222,26 @@ if test -n "${GIT_TAG}"; then
     echo " Ref: ${BRANCH}"
 
     PUSH_TO=${PUSH_TO_GIT_REMOTE:-${REMOTE_NAME}}
-    echo " Remote to push to: ${PUSH_TO}"
+    echo " Remote to push to: $(printurl ${PUSH_TO})"
 
     if test -n "${PUSH_TO}"; then
 
       # Keep note of unique remote names for pushing tag
       grep -qw "${PUSH_TO}" ${REMOTES_FILE} || {
-        echo "Remote '${PUSH_TO}'"
+        echo "Remote '$(printurl ${PUSH_TO})'"
         echo "${PUSH_TO}" >> ${REMOTES_FILE}
       }
 
       if test "${BRANCH}" = "HEAD"; then
         echo "--------------------------------------------------"
-        echo "Skipping push to to HEAD of remote ${PUSH_TO}"
+        echo "Skipping push to to HEAD of remote $(printurl ${PUSH_TO})"
         echo "--------------------------------------------------"
         continue
       fi
 
       echo "--------------------------------------------------"
       echo "Pushing debian changes to branch ${BRANCH}"
-      echo "of remote ${PUSH_TO}"
+      echo "of remote $(printurl ${PUSH_TO})"
       echo "--------------------------------------------------"
       git push ${GIT_DRY_RUN} "${PUSH_TO}" ${TMPBRANCH}:${BRANCH} || exit 1
 
@@ -242,12 +250,12 @@ if test -n "${GIT_TAG}"; then
   done
 
   echo "--------------------------------------------------"
-  echo "Remotes to push to: $(cat ${REMOTES_FILE})"
+  echo "Remotes to push to: $(cat ${REMOTES_FILE} | printurl)"
   echo "--------------------------------------------------"
 
   while read PUSH_TO; do
       echo "--------------------------------------------------"
-      echo "Pushing tag ${GIT_TAG} to ${PUSH_TO}"
+      echo "Pushing tag ${GIT_TAG} to $(printurl ${PUSH_TO})"
       echo "--------------------------------------------------"
       git push ${GIT_DRY_RUN} "${PUSH_TO}" ${GIT_TAG}:${GIT_TAG} || exit 1
   done < ${REMOTES_FILE}
