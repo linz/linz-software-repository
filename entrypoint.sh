@@ -1,10 +1,12 @@
 #!/bin/bash
 
 printurl() {
-  if test -n "$1"; then
-    echo "$1" | printurl
+  if test -z "$1"; then
+    while read -r IN; do
+      printurl "${IN}"
+    done
   else
-    sed 's|://[^:]*:[^@]*@|://<redacted>@|'
+    echo "$1" | sed 's|://[^:]*:[^@]*@|://<redacted>@|'
   fi
 }
 
@@ -201,7 +203,10 @@ if test -n "${GIT_TAG}"; then
 
   REMOTES_FILE=.unique-remotes
 
-  echo "${PUSH_TO_GIT_REMOTE}" > ${REMOTES_FILE}
+  :> ${REMOTES_FILE}
+  if test -n "${PUSH_TO_GIT_REMOTE}"; then
+    echo "${PUSH_TO_GIT_REMOTE}" >> ${REMOTES_FILE}
+  fi
 
   # git for-each-ref will return a format like:
   #
@@ -210,9 +215,11 @@ if test -n "${GIT_TAG}"; then
   git for-each-ref --contains ${START_HASH} \
       --format='%(refname:lstrip=2)' \
       refs/remotes/ |
-  while read REMOTE_REF; do
+  while read -r REMOTE_REF; do
 
+    echo "--------------------------------------------------"
     echo "Remote ref containing start hash: ${REMOTE_REF}"
+    echo "--------------------------------------------------"
 
     REMOTE_NAME=$( echo "${REMOTE_REF}" | sed 's@^ *@@;s@/.*@@' )
     echo " Remote name: ${REMOTE_NAME}"
@@ -227,21 +234,16 @@ if test -n "${GIT_TAG}"; then
 
       # Keep note of unique remote names for pushing tag
       grep -qw "${PUSH_TO}" ${REMOTES_FILE} || {
-        echo "Remote '$(printurl ${PUSH_TO})'"
+        echo " Saving remote '$(printurl ${PUSH_TO})' to ${REMOTES_FILE}"
         echo "${PUSH_TO}" >> ${REMOTES_FILE}
       }
 
       if test "${BRANCH}" = "HEAD"; then
-        echo "--------------------------------------------------"
-        echo "Skipping push to to HEAD of remote $(printurl ${PUSH_TO})"
-        echo "--------------------------------------------------"
+        echo " Skipping push to to HEAD of remote $(printurl ${PUSH_TO})"
         continue
       fi
 
-      echo "--------------------------------------------------"
-      echo "Pushing debian changes to branch ${BRANCH}"
-      echo "of remote $(printurl ${PUSH_TO})"
-      echo "--------------------------------------------------"
+      echo "  Pushing debian changes to branch ${BRANCH} of remote $(printurl ${PUSH_TO})"
       git push ${GIT_DRY_RUN} "${PUSH_TO}" ${TMPBRANCH}:${BRANCH} || exit 1
 
     fi
@@ -249,13 +251,15 @@ if test -n "${GIT_TAG}"; then
   done
 
   echo "--------------------------------------------------"
-  echo "Remotes to push to: $(cat ${REMOTES_FILE} | printurl)"
+  echo "Remotes to push to: $(cat ${REMOTES_FILE} | printurl | tr '\n' ' ')"
   echo "--------------------------------------------------"
 
-  while read PUSH_TO; do
+  while read -r PUSH_TO; do
+      test -z "${PUSH_TO}" && continue # skip empty lines
       echo "--------------------------------------------------"
-      echo "Pushing tag ${GIT_TAG} to $(printurl ${PUSH_TO})"
+      echo "Pushing tag ${GIT_TAG} to '$(printurl ${PUSH_TO})'"
       echo "--------------------------------------------------"
+      echo "git push ${GIT_DRY_RUN} \""$(printurl ${PUSH_TO})"\" ${GIT_TAG}:${GIT_TAG}"
       git push ${GIT_DRY_RUN} "${PUSH_TO}" ${GIT_TAG}:${GIT_TAG} || exit 1
   done < ${REMOTES_FILE}
 
