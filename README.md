@@ -77,6 +77,20 @@ something like the following:
 
     git merge --ff-only ${tag} # tag is printed in output
 
+If you only want to test the image without triggering any changes
+to any remote (packagecloud and git remotes) you can pass the `DRY_RUN`
+environment variable with any non-empty string:
+
+    export PUBLISH_TO_REPOSITORY="test"
+    export PACKAGECLOUD_TOKEN # set to API token
+    export PUSH_TO_GIT_REMOTE=https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}
+    docker run --rm -v $(pwd):/pkg \
+           -e PUBLISH_TO_REPOSITORY \
+           -e PACKAGECLOUD_TOKEN \
+           -e PUSH_TO_GIT_REMOTE \
+           -e DRY_RUN=yes \
+           linz-deb-builder:${DISTRIBUTION}
+
 ## Use of the github action
 
 If you want a github workflow to take care of building packages

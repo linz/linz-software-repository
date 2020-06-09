@@ -18,7 +18,10 @@ echo "      and pushes changes to determined git remote"
 echo "   PUSH_TO_GIT_REMOTE [${PUSH_TO_GIT_REMOTE}]"
 echo "      Git remote name or URL to push debian tag and"
 echo "      changes to, if PUBLISH_TO_REPOSITORY=test."
-echo "      Defaults to the remote containing HEAD ref."
+echo "      Defaults to the remotes containing HEAD ref."
+echo "   DRY_RUN [${DRY_RUN}]"
+echo "      Set to non-empty string to avoid publishing any"
+echo "      package and pushing any change/tag to remote."
 echo "----------------------------------------------------"
 echo
 
@@ -28,6 +31,13 @@ cd ${SRCDIR} || {
   echo "Did you forget to mount package source to ${SRCDIR} ?" >&2
   exit 1
 }
+
+DRY_RUN=${DRY_RUN:-}
+
+GIT_DRY_RUN=
+if test -n "${DRY_RUN}"; then
+  GIT_DRY_RUN=--dry-run
+fi
 
 PATH=$PATH:/usr/local/sbin:/usr/sbin:/sbin:
 
@@ -150,10 +160,6 @@ if test -n "${PUBLISH_TO_REPOSITORY}"; then
   echo "Publishing packages to packagecloud ${REPO}"
   echo "--------------------------------------------------"
 
-  if test -z "${PACKAGECLOUD_TOKEN}"; then
-    echo "Cannot publish to packages without a PACKAGECLOUD_TOKEN" >&2
-    exit 1;
-  fi
   REPO="${PUBLISH_TO_REPOSITORY}"
   case "${REPO}" in
     dev|test)
@@ -164,7 +170,15 @@ if test -n "${PUBLISH_TO_REPOSITORY}"; then
       ;;
   esac
   BASE="linz/${REPO}/ubuntu/${dist}"
-  package_cloud push ${BASE} build-area/*.deb || exit 1
+  if test -n "${DRY_RUN}"; then
+    echo "package_cloud push ${BASE} build-area/*.deb (dry-run)"
+  else
+    if test -z "${PACKAGECLOUD_TOKEN}"; then
+      echo "Cannot publish to packages without a PACKAGECLOUD_TOKEN" >&2
+      exit 1;
+    fi
+    package_cloud push ${BASE} build-area/*.deb || exit 1
+  fi
 
 fi
 
@@ -213,7 +227,7 @@ if test -n "${GIT_TAG}"; then
       echo "Pushing debian changes to branch ${BRANCH}"
       echo "of remote ${PUSH_TO}"
       echo "--------------------------------------------------"
-      git push "${PUSH_TO}" ${TMPBRANCH}:${BRANCH} || exit 1
+      git push ${GIT_DRY_RUN} "${PUSH_TO}" ${TMPBRANCH}:${BRANCH} || exit 1
 
     fi
 
@@ -227,7 +241,7 @@ if test -n "${GIT_TAG}"; then
       echo "--------------------------------------------------"
       echo "Pushing tag ${GIT_TAG} to ${PUSH_TO}"
       echo "--------------------------------------------------"
-      git push "${PUSH_TO}" ${GIT_TAG}:${GIT_TAG} || exit 1
+      git push ${GIT_DRY_RUN} "${PUSH_TO}" ${GIT_TAG}:${GIT_TAG} || exit 1
   done < ${REMOTES_FILE}
 
 fi
