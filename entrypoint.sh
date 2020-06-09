@@ -53,6 +53,11 @@ cleanup() {
   echo "Removing temporary branch"
   echo "--------------------------------------------------"
   git branch -D ${TMPBRANCH}
+
+  echo "--------------------------------------------------"
+  echo "Giving ownership of all files to ${REPO_OWNER}"
+  echo "--------------------------------------------------"
+  chown -R ${REPO_OWNER} .
 }
 
 echo "------------------------------"
@@ -74,6 +79,9 @@ echo "------------------------------"
 
 START_HASH=$( git rev-parse HEAD )
 echo "Start hash (rev-parse HEAD): ${START_HASH}"
+
+REPO_OWNER=$('ls' -ld .git | awk '{print $3}')
+echo "Repository owner: ${REPO_OWNER}"
 
 echo "------------------------------"
 echo "Updating Debian changelog"
