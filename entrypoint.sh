@@ -107,8 +107,7 @@ git config --global user.name "${LAST_COMMITTER_EMAIL}"
 msg="New upstream version" #TODO: tweak this (take as param?)
 tag=$(git describe --tags --exclude 'debian/*')
 dist=$(lsb_release -cs)
-debian_revision=1 # TODO: take as parameter ?
-version="${tag}-${debian_revision}linz~${dist}"
+version="${tag}-linz~${dist}"
 
 echo "Using version: $version"
 echo "Hostname: ${HOSTNAME}"
