@@ -57,10 +57,10 @@ When `PUBLISH_TO_REPOSITORY` is set to `test`:
   - Changes to `debian/changelog` are committed in a temporary branch.
   - A debian tag is created (`debian/${tag}linz_${repo}1`).
 
-  If a remote branch containing the HEAD reference in the source tree
+  If any remote branch containing the HEAD reference in the source tree
   is found, or you pass a remote url/name via `PUSH_TO_GIT_REMOTE` env
-  variable, then both the tag and changes are pushed to corresponding
-  branch and remote. Example:
+  variable, then changes are pushed to each corresponding remote branch
+  and tag is pushed to each unique remote. Example:
 
     export PUBLISH_TO_REPOSITORY="test"
     export PACKAGECLOUD_TOKEN # set to API token

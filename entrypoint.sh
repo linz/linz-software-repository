@@ -62,17 +62,8 @@ echo "------------------------------"
 #echo "# env | grep GITHUB"
 #env | grep GITHUB
 
-echo "# git branch -a --contains HEAD"
-git branch -a --contains HEAD
-
-REMOTE_BRANCH=$( git branch -r --contains ${HEAD} | head -1 | tr -d ' ')
-echo "Remote branch containing HEAD: ${REMOTE_BRANCH}"
-
-REMOTE_NAME=$( echo "${REMOTE_BRANCH}" | sed 's@^ *@@;s@/.*@@' )
-echo "Remote containing HEAD: ${REMOTE_NAME}"
-
-GIT_REMOTE=${PUSH_TO_GIT_REMOTE:-${REMOTE_NAME}}
-echo "Remote we'll be pushing to, if needed: ${GIT_REMOTE}"
+START_HASH=$( git rev-parse HEAD )
+echo "Start hash (rev-parse HEAD): ${START_HASH}"
 
 echo "------------------------------"
 echo "Updating Debian changelog"
@@ -179,23 +170,65 @@ fi
 
 if test -n "${GIT_TAG}"; then
 
-  if test -n "${GIT_REMOTE}"; then
+  REMOTES_FILE=.unique-remotes
 
-    echo "--------------------------------------------------"
-    echo "Pushing tag ${GIT_TAG} to ${GIT_REMOTE}"
-    echo "--------------------------------------------------"
-    git push "${GIT_REMOTE}" ${GIT_TAG}:${GIT_TAG} || exit 1
+  echo "${PUSH_TO_GIT_REMOTE}" > ${REMOTES_FILE}
 
-    echo "--------------------------------------------------"
-    echo "Pushing packaging changes to ${REMOTE_BRANCH}"
-    echo "--------------------------------------------------"
-    BRANCH=$(echo "${REMOTE_BRANCH}" | sed "s@${REMOTE_NAME}/@@")
-    echo "Remote branch name: ${REMOTE_BRANCH}"
-    echo "Remote name: ${REMOTE_NAME}"
-    echo "Branch name: ${BRANCH}"
-    git push "${GIT_REMOTE}" ${TMPBRANCH}:${BRANCH} || exit 1
+  # git for-each-ref will return a format like:
+  #
+  #   origin/all-remote-branches
+  #
+  git for-each-ref --contains ${START_HASH} \
+      --format='%(refname:lstrip=2)' \
+      refs/remotes/ |
+  while read REMOTE_REF; do
 
-  fi
+    echo "Remote ref containing start hash: ${REMOTE_REF}"
+
+    REMOTE_NAME=$( echo "${REMOTE_REF}" | sed 's@^ *@@;s@/.*@@' )
+    echo " Remote name: ${REMOTE_NAME}"
+
+    BRANCH=$(echo "${REMOTE_REF}" | sed "s@${REMOTE_NAME}/@@")
+    echo " Ref: ${BRANCH}"
+
+    PUSH_TO=${PUSH_TO_GIT_REMOTE:-${REMOTE_NAME}}
+    echo " Remote to push to: ${PUSH_TO}"
+
+    if test -n "${PUSH_TO}"; then
+
+      # Keep note of unique remote names for pushing tag
+      grep -qw "${PUSH_TO}" ${REMOTES_FILE} || {
+        echo "Remote '${PUSH_TO}'"
+        echo "${PUSH_TO}" >> ${REMOTES_FILE}
+      }
+
+      if test "${BRANCH}" = "HEAD"; then
+        echo "--------------------------------------------------"
+        echo "Skipping push to to HEAD of remote ${PUSH_TO}"
+        echo "--------------------------------------------------"
+        continue
+      fi
+
+      echo "--------------------------------------------------"
+      echo "Pushing debian changes to branch ${BRANCH}"
+      echo "of remote ${PUSH_TO}"
+      echo "--------------------------------------------------"
+      git push "${PUSH_TO}" ${TMPBRANCH}:${BRANCH} || exit 1
+
+    fi
+
+  done
+
+  echo "--------------------------------------------------"
+  echo "Remotes to push to: $(cat ${REMOTES_FILE})"
+  echo "--------------------------------------------------"
+
+  while read PUSH_TO; do
+      echo "--------------------------------------------------"
+      echo "Pushing tag ${GIT_TAG} to ${PUSH_TO}"
+      echo "--------------------------------------------------"
+      git push "${PUSH_TO}" ${GIT_TAG}:${GIT_TAG} || exit 1
+  done < ${REMOTES_FILE}
 
 fi
 
