@@ -54,13 +54,17 @@ On success, the packages will be also found on:
 
 When `PUBLISH_TO_REPOSITORY` is set to `test`:
 
-  - Changes to `debian/changelog` are committed in a temporary branch.
-  - A debian tag is created (eg. `debian/${tag}-linz~${DISTRIBUTION}`).
+  - Changes to `debian/changelog` are committed to a temporary branch.
+  - A debian git tag is created (eg. `debian/${tag}-linz~${DISTRIBUTION}`).
+  - The debian tag is merged to any local and remote branch containing the
+    initial HEAD reference of the source tree.
+  - The debian tag is pushed to any remote having branches containing the
+    initial HEAD reference of the source tree and to any remote passed
+    via the `PUSH_TO_GIT_REMOTE` env variable.
 
-  If any remote branch containing the HEAD reference in the source tree
-  is found, or you pass a remote url/name via `PUSH_TO_GIT_REMOTE` env
-  variable, then the debian tag is pushed to each remote. Changes are
-  pushed to each remote branch as well. Example:
+Passing a `PUSH_TO_GIT_REMOTE` env variable is useful to specify
+credentials to access the remote (as the docker container will not
+have access to those). Example:
 
     export PUBLISH_TO_REPOSITORY="test"
     export PACKAGECLOUD_TOKEN # set to API token
@@ -70,12 +74,6 @@ When `PUBLISH_TO_REPOSITORY` is set to `test`:
            -e PACKAGECLOUD_TOKEN \
            -e PUSH_TO_GIT_REMOTE \
            linz-deb-builder:${DISTRIBUTION}
-
-If no remote branch is found, you will probably want to merge the work done
-during packaging back to your working branch manually.  You can do so with
-something like the following:
-
-    git merge --ff-only ${tag} # tag is printed in output
 
 If you only want to test the image without triggering any changes
 to any remote (packagecloud and git remotes) you can pass the `DRY_RUN`
