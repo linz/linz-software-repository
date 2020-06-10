@@ -210,43 +210,68 @@ if test -n "${GIT_TAG}"; then
 
   # git for-each-ref will return a format like:
   #
-  #   origin/all-remote-branches
+  #   remotes/origin/all-remote-branches
+  #   heads/all-remote-branches
   #
   git for-each-ref --contains ${START_HASH} \
-      --format='%(refname:lstrip=2)' \
-      refs/remotes/ |
-  while read -r REMOTE_REF; do
+      --format='%(refname:lstrip=1)' \
+      refs/remotes/ refs/heads/ |
+  while read -r REF; do
 
-    echo "--------------------------------------------------"
-    echo "Remote ref containing start hash: ${REMOTE_REF}"
-    echo "--------------------------------------------------"
+    if expr "$REF" : heads/ > /dev/null; then
 
-    REMOTE_NAME=$( echo "${REMOTE_REF}" | sed 's@^ *@@;s@/.*@@' )
-    echo " Remote name: ${REMOTE_NAME}"
+      echo "--------------------------------------------------"
+      echo "Head ref containing start hash: ${REF}"
+      echo "--------------------------------------------------"
 
-    BRANCH=$(echo "${REMOTE_REF}" | sed "s@${REMOTE_NAME}/@@")
-    echo " Ref: ${BRANCH}"
+      HEAD=$( echo "${REF}" | sed 's@^heads/@@' )
+      echo " Head: ${HEAD}"
 
-    PUSH_TO=${PUSH_TO_GIT_REMOTE:-${REMOTE_NAME}}
-    echo " Remote to push to: $(printurl ${PUSH_TO})"
-
-    if test -n "${PUSH_TO}"; then
-
-      # Keep note of unique remote names for pushing tag
-      grep -qw "${PUSH_TO}" ${REMOTES_FILE} || {
-        echo " Saving remote '$(printurl ${PUSH_TO})' to ${REMOTES_FILE}"
-        echo "${PUSH_TO}" >> ${REMOTES_FILE}
-      }
-
-      if test "${BRANCH}" = "HEAD"; then
-        echo " Skipping push to to HEAD of remote $(printurl ${PUSH_TO})"
+      if test "${HEAD}" = "${TMPBRANCH}"; then
+        echo " Skipping merge of tag to temp branch's head ${HEAD}"
         continue
       fi
 
-      echo "  Pushing debian changes to branch ${BRANCH} of remote $(printurl ${PUSH_TO})"
-      git push ${GIT_DRY_RUN} "${PUSH_TO}" ${TMPBRANCH}:${BRANCH} || exit 1
+      echo "  Merging tag '${GIT_TAG}' to head '${HEAD}'"
+      git checkout "${HEAD}" || exit 1
+      git merge --ff-only "${GIT_TAG}" || exit 1
+      git checkout - || exit 1
 
-    fi
+    elif expr "$REF" : remotes/ > /dev/null; then
+
+      echo "--------------------------------------------------"
+      echo "Remote ref containing start hash: ${REF}"
+      echo "--------------------------------------------------"
+
+      REMOTE_NAME=$( echo "${REF}" | sed 's@^remotes/\([^/]*\)/.*@\1@' )
+      echo " Remote name: ${REMOTE_NAME}"
+
+      BRANCH=$(echo "${REF}" | sed "s@^remotes/[^/]*/@@")
+      echo " Remote branch: ${BRANCH}"
+
+      PUSH_TO=${PUSH_TO_GIT_REMOTE:-${REMOTE_NAME}}
+      echo " Remote to push to: $(printurl ${PUSH_TO})"
+
+      if test -z "${REMOTE_NAME}"; then
+        continue # something went wrong ?
+      fi
+
+      # Keep note of unique remote names for pushing tag
+      grep -qw "${REMOTE_NAME}" ${REMOTES_FILE} || {
+        echo " Saving remote '$(printurl ${REMOTE_NAME})' to ${REMOTES_FILE}"
+        echo "${REMOTE_NAME}" >> ${REMOTES_FILE}
+      }
+
+      if test "${BRANCH}" = "HEAD"; then
+        echo " Skipping push to to HEAD of remote $(printurl ${REMOTE_NAME})"
+        continue
+      fi
+
+      echo "  Pushing debian changes to branch ${BRANCH} of remote $(printurl ${REMOTE_NAME})"
+      git push ${GIT_DRY_RUN} "${REMOTE_NAME}" ${TMPBRANCH}:${BRANCH} || exit 1
+
+
+    fi # is a remote ref
 
   done
 
