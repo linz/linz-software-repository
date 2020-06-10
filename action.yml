@@ -12,7 +12,7 @@ inputs:
   packagecloud_token:
     description: 'Package Cloud API Token'
     required: false
-  publish_to_repository:
+  packagecloud_repository:
     description: 'Package Cloud repository to publish to (dev|test)'
     required: false
     default: ''
@@ -27,6 +27,6 @@ runs:
     - ${{ inputs.repo }}
   env:
     PACKAGECLOUD_TOKEN: '${{ inputs.packagecloud_token }}'
-    PUBLISH_TO_REPOSITORY: '${{ inputs.publish_to_repository }}'
+    PACKAGECLOUD_REPOSITORY: '${{ inputs.packagecloud_repository }}'
     PUSH_TO_GIT_REMOTE: '${{ inputs.push_to_git_remote }}'
 
