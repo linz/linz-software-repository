@@ -54,6 +54,13 @@ PATH=$PATH:/usr/local/sbin:/usr/sbin:/sbin:
 TMPBRANCH=pkg-dev-${HOSTNAME}
 
 cleanup() {
+  if test -n "${DRY_RUN}" -a -n "${GIT_TAG}"; then
+    echo "--------------------------------------------------"
+    echo "Removing debian tag (dry run)"
+    echo "--------------------------------------------------"
+    git tag -d "${GIT_TAG}"
+  fi
+
   echo "--------------------------------------------------"
   echo "Checking out previous branch"
   echo "--------------------------------------------------"
