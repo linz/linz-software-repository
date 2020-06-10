@@ -55,12 +55,12 @@ On success, the packages will be also found on:
 When `PUBLISH_TO_REPOSITORY` is set to `test`:
 
   - Changes to `debian/changelog` are committed in a temporary branch.
-  - A debian tag is created (`debian/${tag}linz_${repo}1`).
+  - A debian tag is created (eg. `debian/${tag}-linz~${DISTRIBUTION}`).
 
   If any remote branch containing the HEAD reference in the source tree
   is found, or you pass a remote url/name via `PUSH_TO_GIT_REMOTE` env
-  variable, then changes are pushed to each corresponding remote branch
-  and tag is pushed to each unique remote. Example:
+  variable, then the debian tag is pushed to each remote. Changes are
+  pushed to each remote branch as well. Example:
 
     export PUBLISH_TO_REPOSITORY="test"
     export PACKAGECLOUD_TOKEN # set to API token
