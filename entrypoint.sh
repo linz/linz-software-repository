@@ -10,6 +10,14 @@ printurl() {
   fi
 }
 
+redact() {
+  if test -z "$1"; then
+    echo -n;
+  else
+    echo "<redacted>"
+  fi
+}
+
 echo "----------------------------------------------------"
 echo "LINZ Software Packaging system"
 echo 
@@ -25,7 +33,7 @@ echo "      Can be 'test', 'dev' or empty (default)"
 echo "      for not publishing them at all."
 echo "      Targetting 'test' also creates a debian tag"
 echo "      and pushes changes to determined git remote"
-echo "   PACKAGECLOUD_TOKEN"
+echo "   PACKAGECLOUD_TOKEN ["$(redact "${PACKAGECLOUD_TOKEN}")"]"
 echo "      Token to authorize publishing to packagecloud."
 echo "      Only needed if PACKAGECLOUD_REPOSITORY is not empty."
 echo "   PUSH_TO_GIT_REMOTE [$(printurl ${PUSH_TO_GIT_REMOTE})]"
