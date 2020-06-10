@@ -19,7 +19,7 @@ echo "Supported Arguments:"
 echo "   <srcdir> dir containing source (defaults to /pkg)"
 echo
 echo "Supported Environment Variables:"
-echo "   PUBLISH_TO_REPOSITORY [${PUBLISH_TO_REPOSITORY}]"
+echo "   PACKAGECLOUD_REPOSITORY [${PACKAGECLOUD_REPOSITORY}]"
 echo "      Packagecloud repository to push packages to."
 echo "      Can be 'test', 'dev' or empty (default)"
 echo "      for not publishing them at all."
@@ -27,7 +27,7 @@ echo "      Targetting 'test' also creates a debian tag"
 echo "      and pushes changes to determined git remote"
 echo "   PUSH_TO_GIT_REMOTE [$(printurl ${PUSH_TO_GIT_REMOTE})]"
 echo "      Git remote name or URL to push debian tag and"
-echo "      changes to, if PUBLISH_TO_REPOSITORY=test."
+echo "      changes to, if PACKAGECLOUD_REPOSITORY=test."
 echo "      Defaults to the remotes containing HEAD ref."
 echo "   DRY_RUN [${DRY_RUN}]"
 echo "      Set to non-empty string to avoid publishing any"
@@ -146,7 +146,7 @@ echo "------------------------------"
 echo "Running deb-build-binary"
 echo "------------------------------"
 DEB_BUILD_BINARY_ARGS=
-if test "${PUBLISH_TO_REPOSITORY}" = "test"; then
+if test "${PACKAGECLOUD_REPOSITORY}" = "test"; then
   DEB_BUILD_BINARY_ARGS=--git-tag
 fi
 deb-build-binary ${DEB_BUILD_BINARY_ARGS} > log.deb-build-binary ||
@@ -179,18 +179,18 @@ ls -l build-area/*.deb
 # Check if we need to publish
 #
 
-if test -n "${PUBLISH_TO_REPOSITORY}"; then
+if test -n "${PACKAGECLOUD_REPOSITORY}"; then
 
   echo "--------------------------------------------------"
   echo "Publishing packages to packagecloud ${REPO}"
   echo "--------------------------------------------------"
 
-  REPO="${PUBLISH_TO_REPOSITORY}"
+  REPO="${PACKAGECLOUD_REPOSITORY}"
   case "${REPO}" in
     dev|test)
       ;;
     *)
-      echo "Invalid target linz repository ${REPO} (must be 'dev' or 'test')" >&2
+      echo "Invalid packagecloud repository ${REPO} (must be 'dev' or 'test')" >&2
       exit 1
       ;;
   esac
