@@ -247,9 +247,9 @@ if test -n "${GIT_TAG}"; then
         continue
       fi
 
-      echo " Merging tag '${GIT_TAG}' to head '${HEAD}'"
-      echo "git push ${GIT_DRY_RUN} . 'refs/tags/${GIT_TAG}':'${HEAD}'"
-      git push ${GIT_DRY_RUN} . "refs/tags/${GIT_TAG}":"${HEAD}" || exit 1
+      echo " Merging temporary branch to head '${HEAD}'"
+      echo "git push ${GIT_DRY_RUN} . '${TMPBRANCH}':'${HEAD}'"
+      git push ${GIT_DRY_RUN} . "${TMPBRANCH}":"${HEAD}" || exit 1
 
     elif expr "$REF" : remotes/ > /dev/null; then
 
