@@ -113,7 +113,7 @@ export DEBEMAIL="${LAST_COMMITTER_EMAIL}"
 git config --global user.email "${LAST_COMMITTER_EMAIL}"
 git config --global user.name "${LAST_COMMITTER_NAME}"
 
-msg="New upstream version" #TODO: tweak this (take as param?)
+msg="New version" #TODO: tweak this (take as param?)
 tag=$(git describe --tags --exclude 'debian/*')
 dist=$(lsb_release -cs)
 version="${tag}-linz~${dist}"
