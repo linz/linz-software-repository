@@ -25,6 +25,9 @@ echo "      Can be 'test', 'dev' or empty (default)"
 echo "      for not publishing them at all."
 echo "      Targetting 'test' also creates a debian tag"
 echo "      and pushes changes to determined git remote"
+echo "   PACKAGECLOUD_TOKEN"
+echo "      Token to authorize publishing to packagecloud."
+echo "      Only needed if PACKAGECLOUD_REPOSITORY is not empty."
 echo "   PUSH_TO_GIT_REMOTE [$(printurl ${PUSH_TO_GIT_REMOTE})]"
 echo "      Git remote name or URL to push debian tag and"
 echo "      changes to, if PACKAGECLOUD_REPOSITORY=test."
@@ -206,6 +209,10 @@ if test -n "${PACKAGECLOUD_REPOSITORY}"; then
   fi
 
 fi
+
+#
+# Check if we need to merge changes
+#
 
 if test -n "${GIT_TAG}"; then
 
