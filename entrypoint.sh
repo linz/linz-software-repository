@@ -232,10 +232,9 @@ if test -n "${GIT_TAG}"; then
         continue
       fi
 
-      echo "  Merging tag '${GIT_TAG}' to head '${HEAD}'"
-      git checkout "${HEAD}" || exit 1
-      git merge --ff-only "${GIT_TAG}" || exit 1
-      git checkout - || exit 1
+      echo " Merging tag '${GIT_TAG}' to head '${HEAD}'"
+      echo "git push ${GIT_DRY_RUN} . 'refs/tags/${GIT_TAG}':'${HEAD}'"
+      git push ${GIT_DRY_RUN} . "refs/tags/${GIT_TAG}":"${HEAD}" || exit 1
 
     elif expr "$REF" : remotes/ > /dev/null; then
 
