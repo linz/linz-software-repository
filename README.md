@@ -41,10 +41,10 @@ directory of the source tree.
 If you also want packages to be published to linz repository, pass
 packagecloud token and target repository as environment variables:
 
-    export PUBLISH_TO_REPOSITORY=dev # or "test"
+    export PACKAGECLOUD_REPOSITORY=dev # or "test"
     export PACKAGECLOUD_TOKEN # set to API token
     docker run --rm -v $(pwd):/pkg \
-           -e PUBLISH_TO_REPOSITORY \
+           -e PACKAGECLOUD_REPOSITORY \
            -e PACKAGECLOUD_TOKEN \
            linz-deb-builder:${DISTRIBUTION}
 
@@ -52,7 +52,7 @@ On success, the packages will be also found on:
 
     https://packagecloud.io/linz/${repo}
 
-When `PUBLISH_TO_REPOSITORY` is set to `test`:
+When `PACKAGECLOUD_REPOSITORY` is set to `test`:
 
   - Changes to `debian/changelog` are committed to a temporary branch.
   - A debian git tag is created (eg. `debian/${tag}-linz~${DISTRIBUTION}`).
@@ -66,11 +66,11 @@ Passing a `PUSH_TO_GIT_REMOTE` env variable is useful to specify
 credentials to access the remote (as the docker container will not
 have access to those). Example:
 
-    export PUBLISH_TO_REPOSITORY="test"
+    export PACKAGECLOUD_REPOSITORY="test"
     export PACKAGECLOUD_TOKEN # set to API token
     export PUSH_TO_GIT_REMOTE=https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}
     docker run --rm -v $(pwd):/pkg \
-           -e PUBLISH_TO_REPOSITORY \
+           -e PACKAGECLOUD_REPOSITORY \
            -e PACKAGECLOUD_TOKEN \
            -e PUSH_TO_GIT_REMOTE \
            linz-deb-builder:${DISTRIBUTION}
@@ -79,11 +79,11 @@ If you only want to test the image without triggering any changes
 to any remote (packagecloud and git remotes) you can pass the `DRY_RUN`
 environment variable with any non-empty string:
 
-    export PUBLISH_TO_REPOSITORY="test"
+    export PACKAGECLOUD_REPOSITORY="test"
     export PACKAGECLOUD_TOKEN # set to API token
     export PUSH_TO_GIT_REMOTE=https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}
     docker run --rm -v $(pwd):/pkg \
-           -e PUBLISH_TO_REPOSITORY \
+           -e PACKAGECLOUD_REPOSITORY \
            -e PACKAGECLOUD_TOKEN \
            -e PUSH_TO_GIT_REMOTE \
            -e DRY_RUN=yes \
