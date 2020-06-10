@@ -249,26 +249,26 @@ if test -n "${GIT_TAG}"; then
       BRANCH=$(echo "${REF}" | sed "s@^remotes/[^/]*/@@")
       echo " Remote branch: ${BRANCH}"
 
-      PUSH_TO=${PUSH_TO_GIT_REMOTE:-${REMOTE_NAME}}
-      echo " Remote to push to: $(printurl ${PUSH_TO})"
-
       if test -z "${REMOTE_NAME}"; then
         continue # something went wrong ?
       fi
 
+      PUSH_TO=${PUSH_TO_GIT_REMOTE:-${REMOTE_NAME}}
+      echo " Remote to push to: $(printurl ${PUSH_TO})"
+
       # Keep note of unique remote names for pushing tag
-      grep -qw "${REMOTE_NAME}" ${REMOTES_FILE} || {
-        echo " Saving remote '$(printurl ${REMOTE_NAME})' to ${REMOTES_FILE}"
-        echo "${REMOTE_NAME}" >> ${REMOTES_FILE}
+      grep -qw "${PUSH_TO}" ${REMOTES_FILE} || {
+        echo " Saving remote '$(printurl ${PUSH_TO})' to ${REMOTES_FILE}"
+        echo "${PUSH_TO}" >> ${REMOTES_FILE}
       }
 
       if test "${BRANCH}" = "HEAD"; then
-        echo " Skipping push to to HEAD of remote $(printurl ${REMOTE_NAME})"
+        echo " Skipping push to remote's HEAD"
         continue
       fi
 
-      echo "  Pushing debian changes to branch ${BRANCH} of remote $(printurl ${REMOTE_NAME})"
-      git push ${GIT_DRY_RUN} "${REMOTE_NAME}" ${TMPBRANCH}:${BRANCH} || exit 1
+      echo "  Pushing debian changes to branch ${BRANCH} of remote $(printurl ${PUSH_TO})"
+      git push ${GIT_DRY_RUN} "${PUSH_TO}" ${TMPBRANCH}:${BRANCH} || exit 1
 
 
     fi # is a remote ref
