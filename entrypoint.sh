@@ -154,6 +154,7 @@ deb-build-binary ${DEB_BUILD_BINARY_ARGS} > log.deb-build-binary ||
   cat log.deb-build-binary;
   exit 1
 }
+cat log.deb-build-binary
 
 # If tags are created, we'd get a message like this:
 #
