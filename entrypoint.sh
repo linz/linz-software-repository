@@ -251,7 +251,7 @@ if test -n "${GIT_TAG}"; then
   done
 
   echo "--------------------------------------------------"
-  echo "Remotes to push to: $(cat ${REMOTES_FILE} | printurl | tr '\n' ' ')"
+  echo "Remotes to push tag to: $(cat ${REMOTES_FILE} | printurl | tr '\n' ' ')"
   echo "--------------------------------------------------"
 
   while read -r PUSH_TO; do
