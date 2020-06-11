@@ -193,19 +193,18 @@ ls -l build-area/*.deb
 if test -n "${PACKAGECLOUD_REPOSITORY}"; then
 
   echo "--------------------------------------------------"
-  echo "Publishing packages to packagecloud ${REPO}"
+  echo "Publishing packages to packagecloud ${PACKAGECLOUD_REPOSITORY}"
   echo "--------------------------------------------------"
 
-  REPO="${PACKAGECLOUD_REPOSITORY}"
-  case "${REPO}" in
+  case "${PACKAGECLOUD_REPOSITORY}" in
     dev|test)
       ;;
     *)
-      echo "Invalid packagecloud repository ${REPO} (must be 'dev' or 'test')" >&2
+      echo "Invalid packagecloud repository ${PACKAGECLOUD_REPOSITORY} (must be 'dev' or 'test')" >&2
       exit 1
       ;;
   esac
-  BASE="linz/${REPO}/ubuntu/${dist}"
+  BASE="linz/${PACKAGECLOUD_REPOSITORY}/ubuntu/${dist}"
   if test -n "${DRY_RUN}"; then
     echo "package_cloud push ${BASE} build-area/*.deb (dry-run)"
   else
