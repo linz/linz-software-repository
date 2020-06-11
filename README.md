@@ -56,9 +56,9 @@ When `PACKAGECLOUD_REPOSITORY` is set to `test`:
 
   - Changes to `debian/changelog` are committed to a temporary branch.
   - A debian git tag is created (eg. `debian/${tag}-linz~${DISTRIBUTION}`).
-  - The debian tag is merged to any local and remote branch containing the
-    initial HEAD reference of the source tree.
-  - The debian tag is pushed to any remote having branches containing the
+  - The debian tag is merged to any local and remote branch pointing
+    at the initial HEAD reference of the source tree.
+  - The debian tag is pushed to any remote having branches pointing at the
     initial HEAD reference of the source tree and to any remote passed
     via the `PUSH_TO_GIT_REMOTE` env variable.
 
