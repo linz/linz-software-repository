@@ -39,7 +39,7 @@ echo "      Only needed if PACKAGECLOUD_REPOSITORY is not empty."
 echo "   PUSH_TO_GIT_REMOTE [$(printurl ${PUSH_TO_GIT_REMOTE})]"
 echo "      Git remote name or URL to push debian tag and"
 echo "      changes to, if PACKAGECLOUD_REPOSITORY=test."
-echo "      Defaults to the remotes containing HEAD ref."
+echo "      Defaults to the remotes pointing at HEAD ref."
 echo "   DRY_RUN [${DRY_RUN}]"
 echo "      Set to non-empty string to avoid publishing any"
 echo "      package and pushing any change/tag to remote."
@@ -236,7 +236,7 @@ if test -n "${GIT_TAG}"; then
   #   remotes/origin/all-remote-branches
   #   heads/all-remote-branches
   #
-  git for-each-ref --contains ${START_HASH} \
+  git for-each-ref --points-at ${START_HASH} \
       --format='%(refname:lstrip=1)' \
       refs/remotes/ refs/heads/ |
   while read -r REF; do
@@ -244,7 +244,7 @@ if test -n "${GIT_TAG}"; then
     if expr "$REF" : heads/ > /dev/null; then
 
       echo "--------------------------------------------------"
-      echo "Head ref containing start hash: ${REF}"
+      echo "Head ref pointing at start hash: ${REF}"
       echo "--------------------------------------------------"
 
       HEAD=$( echo "${REF}" | sed 's@^heads/@@' )
@@ -262,7 +262,7 @@ if test -n "${GIT_TAG}"; then
     elif expr "$REF" : remotes/ > /dev/null; then
 
       echo "--------------------------------------------------"
-      echo "Remote ref containing start hash: ${REF}"
+      echo "Remote ref pointing at start hash: ${REF}"
       echo "--------------------------------------------------"
 
       REMOTE_NAME=$( echo "${REF}" | sed 's@^remotes/\([^/]*\)/.*@\1@' )
