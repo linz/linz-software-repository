@@ -162,7 +162,9 @@ echo "------------------------------"
 echo "Running deb-build-binary"
 echo "------------------------------"
 DEB_BUILD_BINARY_ARGS=
-if test "${PACKAGECLOUD_REPOSITORY}" = "test"; then
+if test "${PACKAGECLOUD_REPOSITORY}" = "test" -o \
+        "${PACKAGECLOUD_REPOSITORY}" = "private-test"
+then
   DEB_BUILD_BINARY_ARGS=--git-tag
 fi
 deb-build-binary ${DEB_BUILD_BINARY_ARGS} > log.deb-build-binary ||
@@ -202,10 +204,15 @@ if test -n "${PACKAGECLOUD_REPOSITORY}"; then
   echo "--------------------------------------------------"
 
   case "${PACKAGECLOUD_REPOSITORY}" in
-    dev|test)
+    dev|test|private-dev|private-test)
       ;;
     *)
-      echo "Invalid packagecloud repository ${PACKAGECLOUD_REPOSITORY} (must be 'dev' or 'test')" >&2
+      echo "Invalid packagecloud repository ${PACKAGECLOUD_REPOSITORY}" >&2
+      echo "Valid values are:" >&2
+      echo " - dev" >&2
+      echo " - private-dev" >&2
+      echo " - test" >&2
+      echo " - private-test" >&2
       exit 1
       ;;
   esac
