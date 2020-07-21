@@ -111,8 +111,16 @@ you'll need to pass appropriate parameters:
         packagecloud_token: ${{ secrets.PACKAGECLOUD_TOKEN }}
         publish_to_repository: 'dev'
 
-When publishing to the 'test' repository you will also want
-to set the "origin" url to have credentials:
+When publishing to the 'test' repository the action will
+also try to push changes to debian/changelog file back
+to the origin, togheter with a `debian/xxx` tag. In order
+for the action to have credentials to push these objects
+you'll need to set the "origin" url to include the
+authentication token. Note that the token must belong to
+a user who has permissions to push to all branches containing
+the initial reference from the checked out repository
+(which reference is checked out depends on the action triggering
+the event). Protected branches can get in your way!
 
     steps:
     - uses: actions/checkout@v1
