@@ -17,13 +17,20 @@ FROM ubuntu:${DISTRIBUTION}
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update
-RUN apt-get install -y \
+RUN apt-get update && apt-get install -y \
     apt-transport-https \
+    build-essential \
     ca-certificates \
     curl \
+    devscripts \
+    equivs \
+    git \
+    git-buildpackage \
     gnupg \
-    lsb-release
+    lsb-release \
+    make \
+    software-properties-common \
+    wget
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 RUN curl -s https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
@@ -35,16 +42,7 @@ RUN curl -s https://packagecloud.io/install/repositories/linz/test/script.deb.sh
 RUN curl -s https://packagecloud.io/install/repositories/linz/prod/script.deb.sh | bash
 
 
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    devscripts \
-    equivs \
-    git \
-    git-buildpackage \
-    make \
-    wget
-
-RUN apt-get update && apt-get install -y software-properties-common
+# Install ruby2.3, for packagecloud
 RUN add-apt-repository -y ppa:brightbox/ruby-ng
 RUN apt-get update && apt-get -y install ruby2.3 ruby2.3-dev
 
@@ -55,8 +53,6 @@ ENV REALLY_GEM_UPDATE_SYSTEM=1
 RUN gem update --system 3.0.6
 RUN gem install rake
 RUN gem install package_cloud
-
-
 
 
 RUN echo "DEBIAN_FRONTEND=noninteractive" >> /etc/environment
