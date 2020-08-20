@@ -42,14 +42,21 @@ RUN apt-get update && apt-get install -y \
     git \
     git-buildpackage \
     make \
-    ruby-full \
     wget
 
-# Workaround for packagecloud tool bug,
-# see https://github.com/rubygems/rubygems/issues/3068#issuecomment-574775885
+RUN apt-get update && apt-get install -y software-properties-common
+RUN add-apt-repository -y ppa:brightbox/ruby-ng
+RUN apt-get update && apt-get -y install ruby2.3 ruby2.3-dev
+
+## Workaround for packagecloud tool bug,
+## see https://github.com/rubygems/rubygems/issues/3068#issuecomment-574775885
+ENV REALLY_GEM_UPDATE_SYSTEM=1
+## 3.0.6
 RUN gem update --system 3.0.6
 RUN gem install rake
 RUN gem install package_cloud
+
+
 
 
 RUN echo "DEBIAN_FRONTEND=noninteractive" >> /etc/environment
