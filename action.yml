@@ -17,7 +17,9 @@ inputs:
     required: false
     default: ''
   push_to_git_remote:
-    description: 'Name or URL of git remote to push changes to. If unset will be determined from containment of HEAD ref.'
+    description:
+      'Name or URL of git remote to push changes to. If unset will be determined from containment of
+      HEAD ref.'
     required: false
     default: ''
 runs:
@@ -29,4 +31,3 @@ runs:
     PACKAGECLOUD_TOKEN: '${{ inputs.packagecloud_token }}'
     PACKAGECLOUD_REPOSITORY: '${{ inputs.packagecloud_repository }}'
     PUSH_TO_GIT_REMOTE: '${{ inputs.push_to_git_remote }}'
-
