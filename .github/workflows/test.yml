@@ -18,6 +18,7 @@ jobs:
         distro:
           - 18.04
           - 20.04
+          - 22.04
         runner:
           - ubuntu-18.04
           - ubuntu-20.04
