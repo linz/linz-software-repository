@@ -7,6 +7,7 @@ jobs:
   test:
     name: Test image building on ${{ matrix.runner }}
     strategy:
+      fail-fast: false
       matrix:
         runner:
           - ubuntu-18.04
