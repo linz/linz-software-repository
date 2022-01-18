@@ -13,5 +13,5 @@ jobs:
     name: Test image building
     runs-on: ubuntu-18.04
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2.4.0
     - run: make DISTRIBUTION=bionic image
