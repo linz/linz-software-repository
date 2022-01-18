@@ -11,10 +11,13 @@ on:
 
 jobs:
   test:
-    name: Test image building on ${{ matrix.runner }}
+    name: Build ${{ matrix.distro }} on ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
+        distro:
+          - 18.04
+          - 20.04
         runner:
           - ubuntu-18.04
           - ubuntu-20.04
@@ -28,4 +31,4 @@ jobs:
         uses: cachix/install-nix-action@v16
 
       - name: Build image
-        run: nix-shell --pure --run 'make DISTRIBUTION=bionic image'
+        run: nix-shell --pure --run 'make DISTRIBUTION=${{ matrix.distro }} image'
