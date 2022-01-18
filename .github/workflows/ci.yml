@@ -11,8 +11,15 @@ on:
 
 jobs:
   test:
-    name: Test image building
-    runs-on: ubuntu-18.04
+    name: Test image building on ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner:
+          - ubuntu-18.04
+          - ubuntu-20.04
+          - ubuntu-latest
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v2.4.0
       - run: make DISTRIBUTION=bionic image
