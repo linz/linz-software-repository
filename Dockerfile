@@ -12,7 +12,7 @@
 ################################################################################
 
 # Pass via env, like: docker build --build-arg DISTRIBUTION=18.04 ...
-ARG  DISTRIBUTION=bionic
+ARG  DISTRIBUTION
 FROM ubuntu:${DISTRIBUTION}
 
 ENV DEBIAN_FRONTEND noninteractive
