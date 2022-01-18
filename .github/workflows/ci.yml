@@ -2,13 +2,12 @@ name: CI
 
 on:
   pull_request:
-    types: [ opened, synchronize ]
+    types: [opened, synchronize]
   push:
     branches:
       - master
 
 jobs:
-
   test:
     name: Test image building on ${{ matrix.runner }}
     strategy:
@@ -20,5 +19,5 @@ jobs:
           - ubuntu-latest
     runs-on: ${{ matrix.runner }}
     steps:
-    - uses: actions/checkout@v2.4.0
-    - run: make DISTRIBUTION=bionic image
+      - uses: actions/checkout@v2.4.0
+      - run: make DISTRIBUTION=bionic image
