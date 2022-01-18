@@ -9,7 +9,4 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v1
-    - name: Build default image (bionic)
-      run: make image
-    - name: Build trusty image
-      run: DISTRIBUTION=trusty make image
+    - run: make DISTRIBUTION=bionic image
