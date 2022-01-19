@@ -24,5 +24,3 @@ mk-build-deps \
     -r \
     -t 'apt-get -y --allow-unauthenticated' \
     debian/control
-
-# vim: set ts=4 sts=4 sw=4 et:

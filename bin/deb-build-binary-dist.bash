@@ -39,5 +39,3 @@ gbp buildpackage \
 
 git checkout "$CURBRANCH"
 git branch -D "$BUILDBRANCH"
-
-# vim: set ts=4 sts=4 sw=4 et:
