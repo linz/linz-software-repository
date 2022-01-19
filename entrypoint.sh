@@ -20,7 +20,7 @@ redact() {
 
 echo "----------------------------------------------------"
 echo "LINZ Software Packaging system"
-echo 
+echo
 echo "Arguments: $*"
 echo
 echo "Supported Arguments:"
@@ -156,7 +156,7 @@ rm -vrf build-area/
 echo "------------------------------"
 echo "Running deb-build-dependencies"
 echo "------------------------------"
-deb-build-dependencies || exit 1
+deb-build-dependencies.bash || exit 1
 
 echo "------------------------------"
 echo "Running deb-build-binary"
@@ -167,12 +167,12 @@ if test "${PACKAGECLOUD_REPOSITORY}" = "test" -o \
 then
   DEB_BUILD_BINARY_ARGS=--git-tag
 fi
-deb-build-binary ${DEB_BUILD_BINARY_ARGS} > log.deb-build-binary ||
+deb-build-binary.bash ${DEB_BUILD_BINARY_ARGS} > log.deb-build-binary.bash ||
 {
-  cat log.deb-build-binary;
+  cat log.deb-build-binary.bash;
   exit 1
 }
-cat log.deb-build-binary
+cat log.deb-build-binary.bash
 
 # If tags are created, we'd get a message like this:
 #
@@ -324,4 +324,3 @@ if test -n "${GIT_TAG}"; then
   done < ${REMOTES_FILE}
 
 fi
-

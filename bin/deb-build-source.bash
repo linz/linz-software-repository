@@ -19,6 +19,6 @@ gbp buildpackage \
     --git-upstream-tag='%(version)s' \
     --git-ignore-branch \
     --git-ignore-new \
-    -S -us -uc $@
+    -S -us -uc "$@"
 
 # vim: set ts=4 sts=4 sw=4 et:
