@@ -15,12 +15,12 @@ DIST=$(lsb_release -cs)
 CURBRANCH=$(git rev-parse --abbrev-ref HEAD)
 BUILDBRANCH=pkg-build-dist-$DIST-$(date +%s)
 
-git branch $BUILDBRANCH
-git checkout $BUILDBRANCH
+git branch "$BUILDBRANCH"
+git checkout "$BUILDBRANCH"
 
 dch \
     --newversion "$(git tag --sort=version:refname | grep -v debian | tail -n 1)-1linz~${DIST}1" \
-    --distribution $DIST \
+    --distribution "$DIST" \
     "Package rebuild for $DIST"
 
 git add debian/changelog
@@ -37,7 +37,7 @@ gbp buildpackage \
     --git-tag \
     -b -us -uc
 
-git checkout $CURBRANCH
-git branch -D $BUILDBRANCH
+git checkout "$CURBRANCH"
+git branch -D "$BUILDBRANCH"
 
 # vim: set ts=4 sts=4 sw=4 et:
