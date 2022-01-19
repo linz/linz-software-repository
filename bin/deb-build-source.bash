@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ################################################################################
 #
@@ -20,5 +20,3 @@ gbp buildpackage \
     --git-ignore-branch \
     --git-ignore-new \
     -S -us -uc "$@"
-
-# vim: set ts=4 sts=4 sw=4 et:

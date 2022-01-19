@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ################################################################################
 #
@@ -12,8 +12,8 @@
 ################################################################################
 
 test -f debian/control || {
-  echo "Cannot find debian/control file" >&2
-  exit 1
+    echo "Cannot find debian/control file" >&2
+    exit 1
 }
 
 # TODO: Should this really be here ? I'd think NOT !
@@ -24,5 +24,3 @@ mk-build-deps \
     -r \
     -t 'apt-get -y --allow-unauthenticated' \
     debian/control
-
-# vim: set ts=4 sts=4 sw=4 et:
