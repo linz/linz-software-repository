@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
 printurl() {
-  if test -z "$1"; then
-    while read -r IN; do
+  if test -z "$1"
+  then
+    while read -r IN
+    do
       printurl "${IN}"
     done
   else
@@ -11,8 +13,9 @@ printurl() {
 }
 
 redact() {
-  if test -z "$1"; then
-    echo -n;
+  if test -z "$1"
+  then
+    echo -n
   else
     echo "<redacted>"
   fi
@@ -56,7 +59,8 @@ cd "${SRCDIR}" || {
 DRY_RUN=${DRY_RUN:-}
 
 GIT_DRY_RUN=
-if test -n "${DRY_RUN}"; then
+if test -n "${DRY_RUN}"
+then
   GIT_DRY_RUN=--dry-run
 fi
 
@@ -70,7 +74,8 @@ cleanup() {
   echo "|  CLEANING UP   |"
   echo " ----------------"
 
-  if test -n "${DRY_RUN}" -a -n "${GIT_TAG}"; then
+  if test -n "${DRY_RUN}" -a -n "${GIT_TAG}"
+  then
     echo "--------------------------------------------------"
     echo "Removing debian tag (dry run)"
     echo "--------------------------------------------------"
@@ -169,7 +174,7 @@ then
 fi
 deb-build-binary.bash ${DEB_BUILD_BINARY_ARGS} > log.deb-build-binary.bash ||
 {
-  cat log.deb-build-binary.bash;
+  cat log.deb-build-binary.bash
   exit 1
 }
 cat log.deb-build-binary.bash
@@ -182,7 +187,8 @@ GIT_TAG=$(
   grep 'Tagging Debian package .* as debian/' log.deb-build-binary |
   sed 's@.* as debian/@debian/@;s@ in git$@@'
 )
-if test -n "${GIT_TAG}"; then
+if test -n "${GIT_TAG}"
+then
   echo "GIT TAG ${GIT_TAG} created"
 fi
 
@@ -197,7 +203,8 @@ ls -l build-area/*.deb
 # Check if we need to publish
 #
 
-if test -n "${PACKAGECLOUD_REPOSITORY}"; then
+if test -n "${PACKAGECLOUD_REPOSITORY}"
+then
 
   echo "--------------------------------------------------"
   echo "Publishing packages to packagecloud ${PACKAGECLOUD_REPOSITORY}"
@@ -217,12 +224,14 @@ if test -n "${PACKAGECLOUD_REPOSITORY}"; then
       ;;
   esac
   BASE="linz/${PACKAGECLOUD_REPOSITORY}/ubuntu/${dist}"
-  if test -n "${DRY_RUN}"; then
+  if test -n "${DRY_RUN}"
+  then
     echo "package_cloud push ${BASE} build-area/*.deb (dry-run)"
   else
-    if test -z "${PACKAGECLOUD_TOKEN}"; then
+    if test -z "${PACKAGECLOUD_TOKEN}"
+    then
       echo "Cannot publish to packages without a PACKAGECLOUD_TOKEN" >&2
-      exit 1;
+      exit 1
     fi
     package_cloud push "${BASE}" build-area/*.deb || exit 1
   fi
@@ -233,12 +242,14 @@ fi
 # Check if we need to merge changes
 #
 
-if test -n "${GIT_TAG}"; then
+if test -n "${GIT_TAG}"
+then
 
   REMOTES_FILE=.unique-remotes
 
   :> ${REMOTES_FILE}
-  if test -n "${PUSH_TO_GIT_REMOTE}"; then
+  if test -n "${PUSH_TO_GIT_REMOTE}"
+  then
     echo "${PUSH_TO_GIT_REMOTE}" >> ${REMOTES_FILE}
   fi
 
@@ -250,9 +261,11 @@ if test -n "${GIT_TAG}"; then
   git for-each-ref --points-at "${START_HASH}" \
       --format='%(refname:lstrip=1)' \
       refs/remotes/ refs/heads/ |
-  while read -r REF; do
+  while read -r REF
+  do
 
-    if expr "$REF" : heads/ > /dev/null; then
+    if expr "$REF" : heads/ > /dev/null
+    then
 
       echo "--------------------------------------------------"
       echo "Head ref pointing at start hash: ${REF}"
@@ -261,7 +274,8 @@ if test -n "${GIT_TAG}"; then
       HEAD="${REF//^heads\//}"
       echo " Head: ${HEAD}"
 
-      if test "${HEAD}" = "${TMPBRANCH}"; then
+      if test "${HEAD}" = "${TMPBRANCH}"
+      then
         echo " Skipping merge of tag to temp branch's head ${HEAD}"
         continue
       fi
@@ -270,7 +284,8 @@ if test -n "${GIT_TAG}"; then
       echo "git push ${GIT_DRY_RUN} . '${TMPBRANCH}':'${HEAD}'"
       git push ${GIT_DRY_RUN} . "${TMPBRANCH}":"${HEAD}" || exit 1
 
-    elif expr "$REF" : remotes/ > /dev/null; then
+    elif expr "$REF" : remotes/ > /dev/null
+    then
 
       echo "--------------------------------------------------"
       echo "Remote ref pointing at start hash: ${REF}"
@@ -284,7 +299,8 @@ if test -n "${GIT_TAG}"; then
       BRANCH="${BRANCH#*/}"
       echo " Remote branch: ${BRANCH}"
 
-      if test -z "${REMOTE_NAME}"; then
+      if test -z "${REMOTE_NAME}"
+      then
         continue # something went wrong ?
       fi
 
@@ -297,7 +313,8 @@ if test -n "${GIT_TAG}"; then
         echo "${PUSH_TO}" >> ${REMOTES_FILE}
       }
 
-      if test "${BRANCH}" = "HEAD"; then
+      if test "${BRANCH}" = "HEAD"
+      then
         echo " Skipping push to remote's HEAD"
         continue
       fi
@@ -314,7 +331,8 @@ if test -n "${GIT_TAG}"; then
   echo "Remotes to push tag to: $(printurl < "${REMOTES_FILE}" | tr '\n' ' ')"
   echo "--------------------------------------------------"
 
-  while read -r PUSH_TO; do
+  while read -r PUSH_TO
+  do
       test -z "${PUSH_TO}" && continue # skip empty lines
       echo "--------------------------------------------------"
       echo "Pushing tag ${GIT_TAG} to '$(printurl "${PUSH_TO}")'"
