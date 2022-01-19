@@ -11,17 +11,17 @@
 #
 ################################################################################
 
-DIST=$(lsb_release -cs)
-CURBRANCH=$(git rev-parse --abbrev-ref HEAD)
-BUILDBRANCH=pkg-build-dist-$DIST-$(date +%s)
+dist=$(lsb_release -cs)
+curbranch=$(git rev-parse --abbrev-ref HEAD)
+buildbranch=pkg-build-dist-$dist-$(date +%s)
 
-git branch "$BUILDBRANCH"
-git checkout "$BUILDBRANCH"
+git branch "$buildbranch"
+git checkout "$buildbranch"
 
 dch \
-    --newversion "$(git tag --sort=version:refname | grep -v debian | tail -n 1)-1linz~${DIST}1" \
-    --distribution "$DIST" \
-    "Package rebuild for $DIST"
+    --newversion "$(git tag --sort=version:refname | grep -v debian | tail -n 1)-1linz~${dist}1" \
+    --distribution "$dist" \
+    "Package rebuild for $dist"
 
 git add debian/changelog
 git commit -m "Debian changelog update for package rebuild"
@@ -37,5 +37,5 @@ gbp buildpackage \
     --git-tag \
     -b -us -uc
 
-git checkout "$CURBRANCH"
-git branch -D "$BUILDBRANCH"
+git checkout "$curbranch"
+git branch -D "$buildbranch"
