@@ -60,6 +60,6 @@ RUN echo "DEBIAN_FRONTEND=noninteractive" >> /etc/environment
 ADD bin/* /usr/local/bin/
 RUN chmod 755 /usr/local/bin/*
 
-COPY entrypoint.sh /entrypoint.sh
+COPY entrypoint.bash /
 
-ENTRYPOINT [ "/entrypoint.sh" ]
+ENTRYPOINT [ "/entrypoint.bash" ]
