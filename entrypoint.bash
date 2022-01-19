@@ -171,7 +171,7 @@ if test "${PACKAGECLOUD_REPOSITORY}" = "test" -o \
     then
     deb_build_binary_args=--git-tag
 fi
-deb-build-binary.bash ${deb_build_binary_args} >log.deb-build-binary.bash ||
+deb-build-binary.bash "${deb_build_binary_args}" >log.deb-build-binary.bash ||
     {
         cat log.deb-build-binary.bash
         exit 1
@@ -280,7 +280,7 @@ then
 
                 echo " Merging temporary branch to head '${head}'"
                 echo "git push ${git_dry_run} . '${tmpbranch}':'${head}'"
-                git push ${git_dry_run} . "${tmpbranch}":"${head}" || exit 1
+                git push "${git_dry_run}" . "${tmpbranch}":"${head}" || exit 1
 
             elif expr "$ref" : remotes/ >/dev/null
             then
@@ -306,7 +306,7 @@ then
                 echo " Remote to push to: $(printurl "${push_to}")"
 
                 # Keep note of unique remote names for pushing tag
-                grep -qw "${push_to}" ${remotes_file} || {
+                grep -qw "${push_to}" "${remotes_file}" || {
                     echo " Saving remote '$(printurl "${push_to}")' to ${remotes_file}"
                     echo "${push_to}" >>${remotes_file}
                 }
@@ -318,7 +318,7 @@ then
                 fi
 
                 echo "  Pushing debian changes to branch ${branch} of remote $(printurl "${push_to}")"
-                git push ${git_dry_run} "${push_to}" "${tmpbranch}:${branch}" || exit 1
+                git push "${git_dry_run}" "${push_to}" "${tmpbranch}:${branch}" || exit 1
 
             fi
             # is a remote ref
@@ -336,7 +336,7 @@ then
         echo "Pushing tag ${git_tag} to '$(printurl "${push_to}")'"
         echo "--------------------------------------------------"
         echo "git push ${git_dry_run} \"$(printurl "${push_to}")\" ${git_tag}:${git_tag}"
-        git push ${git_dry_run} "${push_to}" "${git_tag}:${git_tag}" || exit 1
-    done <${remotes_file}
+        git push "${git_dry_run}" "${push_to}" "${git_tag}:${git_tag}" || exit 1
+    done < "${remotes_file}"
 
 fi
