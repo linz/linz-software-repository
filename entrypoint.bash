@@ -1,24 +1,24 @@
 #!/usr/bin/env bash
 
 printurl() {
-  if test -z "$1"
-  then
-    while read -r IN
-    do
-      printurl "${IN}"
-    done
-  else
-    echo "${1//:\/\/[^:]*:[^@]*@/://<redacted>@}"
-  fi
+    if test -z "$1"
+    then
+        while read -r IN
+        do
+            printurl "${IN}"
+        done
+    else
+        echo "${1//:\/\/[^:]*:[^@]*@/://<redacted>@}"
+    fi
 }
 
 redact() {
-  if test -z "$1"
-  then
-    echo -n
-  else
-    echo "<redacted>"
-  fi
+    if test -z "$1"
+    then
+        echo -n
+    else
+        echo "<redacted>"
+    fi
 }
 
 echo "----------------------------------------------------"
@@ -49,11 +49,10 @@ echo "      package and pushing any change/tag to remote."
 echo "----------------------------------------------------"
 echo
 
-
 SRCDIR=${1-"/pkg"}
 cd "${SRCDIR}" || {
-  echo "Did you forget to mount package source to ${SRCDIR} ?" >&2
-  exit 1
+    echo "Did you forget to mount package source to ${SRCDIR} ?" >&2
+    exit 1
 }
 
 DRY_RUN=${DRY_RUN:-}
@@ -61,7 +60,7 @@ DRY_RUN=${DRY_RUN:-}
 GIT_DRY_RUN=
 if test -n "${DRY_RUN}"
 then
-  GIT_DRY_RUN=--dry-run
+    GIT_DRY_RUN=--dry-run
 fi
 
 PATH=$PATH:/usr/local/sbin:/usr/sbin:/sbin:
@@ -70,32 +69,32 @@ TMPBRANCH=pkg-dev-${HOSTNAME}
 
 cleanup() {
 
-  echo " ----------------"
-  echo "|  CLEANING UP   |"
-  echo " ----------------"
+    echo " ----------------"
+    echo "|  CLEANING UP   |"
+    echo " ----------------"
 
-  if test -n "${DRY_RUN}" -a -n "${GIT_TAG}"
-  then
+    if test -n "${DRY_RUN}" -a -n "${GIT_TAG}"
+    then
+        echo "--------------------------------------------------"
+        echo "Removing debian tag (dry run)"
+        echo "--------------------------------------------------"
+        git tag -d "${GIT_TAG}"
+    fi
+
     echo "--------------------------------------------------"
-    echo "Removing debian tag (dry run)"
+    echo "Checking out previous branch"
     echo "--------------------------------------------------"
-    git tag -d "${GIT_TAG}"
-  fi
+    git checkout -
 
-  echo "--------------------------------------------------"
-  echo "Checking out previous branch"
-  echo "--------------------------------------------------"
-  git checkout -
+    echo "--------------------------------------------------"
+    echo "Removing temporary branch"
+    echo "--------------------------------------------------"
+    git branch -D "${TMPBRANCH}"
 
-  echo "--------------------------------------------------"
-  echo "Removing temporary branch"
-  echo "--------------------------------------------------"
-  git branch -D "${TMPBRANCH}"
-
-  echo "--------------------------------------------------"
-  echo "Giving ownership of all files to ${REPO_OWNER}"
-  echo "--------------------------------------------------"
-  chown -R "${REPO_OWNER}" .
+    echo "--------------------------------------------------"
+    echo "Giving ownership of all files to ${REPO_OWNER}"
+    echo "--------------------------------------------------"
+    chown -R "${REPO_OWNER}" .
 }
 
 echo "------------------------------"
@@ -115,7 +114,7 @@ echo "------------------------------"
 #echo "# env | grep GITHUB"
 #env | grep GITHUB
 
-START_HASH="$( git rev-parse HEAD )"
+START_HASH="$(git rev-parse HEAD)"
 echo "Start hash (rev-parse HEAD): ${START_HASH}"
 
 REPO_OWNER="$(find .git -maxdepth 0 -printf %u)"
@@ -134,7 +133,7 @@ export DEBEMAIL="${LAST_COMMITTER_EMAIL}"
 git config --global user.email "${LAST_COMMITTER_EMAIL}"
 git config --global user.name "${LAST_COMMITTER_NAME}"
 
-msg="New version" #TODO: tweak this (take as param?)
+msg="New version"                          #TODO: tweak this (take as param?)
 tag=$(git describe --tags --match '[^d]*') # excluding debian/* tags
 dist=$(lsb_release -cs)
 version="${tag}-linz~${dist}"
@@ -168,15 +167,15 @@ echo "Running deb-build-binary"
 echo "------------------------------"
 DEB_BUILD_BINARY_ARGS=
 if test "${PACKAGECLOUD_REPOSITORY}" = "test" -o \
-        "${PACKAGECLOUD_REPOSITORY}" = "private-test"
-then
-  DEB_BUILD_BINARY_ARGS=--git-tag
+    "${PACKAGECLOUD_REPOSITORY}" = "private-test"
+    then
+    DEB_BUILD_BINARY_ARGS=--git-tag
 fi
-deb-build-binary.bash ${DEB_BUILD_BINARY_ARGS} > log.deb-build-binary.bash ||
-{
-  cat log.deb-build-binary.bash
-  exit 1
-}
+deb-build-binary.bash ${DEB_BUILD_BINARY_ARGS} >log.deb-build-binary.bash ||
+    {
+        cat log.deb-build-binary.bash
+        exit 1
+    }
 cat log.deb-build-binary.bash
 
 # If tags are created, we'd get a message like this:
@@ -184,12 +183,12 @@ cat log.deb-build-binary.bash
 # gbp:info: Tagging Debian package 1.10.1-1-ga857db0-linz~bionic1 as debian/1.10.1-1-ga857db0-linz_bionic1 in git
 #
 GIT_TAG=$(
-  grep 'Tagging Debian package .* as debian/' log.deb-build-binary |
-  sed 's@.* as debian/@debian/@;s@ in git$@@'
+    grep 'Tagging Debian package .* as debian/' log.deb-build-binary |
+        sed 's@.* as debian/@debian/@;s@ in git$@@'
 )
 if test -n "${GIT_TAG}"
 then
-  echo "GIT TAG ${GIT_TAG} created"
+    echo "GIT TAG ${GIT_TAG} created"
 fi
 
 echo "-------------------------------------"
@@ -198,7 +197,6 @@ echo "-------------------------------------"
 
 ls -l build-area/*.deb
 
-
 #
 # Check if we need to publish
 #
@@ -206,35 +204,35 @@ ls -l build-area/*.deb
 if test -n "${PACKAGECLOUD_REPOSITORY}"
 then
 
-  echo "--------------------------------------------------"
-  echo "Publishing packages to packagecloud ${PACKAGECLOUD_REPOSITORY}"
-  echo "--------------------------------------------------"
+    echo "--------------------------------------------------"
+    echo "Publishing packages to packagecloud ${PACKAGECLOUD_REPOSITORY}"
+    echo "--------------------------------------------------"
 
-  case "${PACKAGECLOUD_REPOSITORY}" in
-    dev|test|private-dev|private-test)
-      ;;
-    *)
-      echo "Invalid packagecloud repository ${PACKAGECLOUD_REPOSITORY}" >&2
-      echo "Valid values are:" >&2
-      echo " - dev" >&2
-      echo " - private-dev" >&2
-      echo " - test" >&2
-      echo " - private-test" >&2
-      exit 1
-      ;;
-  esac
-  BASE="linz/${PACKAGECLOUD_REPOSITORY}/ubuntu/${dist}"
-  if test -n "${DRY_RUN}"
-  then
-    echo "package_cloud push ${BASE} build-area/*.deb (dry-run)"
-  else
-    if test -z "${PACKAGECLOUD_TOKEN}"
+    case "${PACKAGECLOUD_REPOSITORY}" in
+        dev | test | private-dev | private-test)
+            ;;
+        *)
+            echo "Invalid packagecloud repository ${PACKAGECLOUD_REPOSITORY}" >&2
+            echo "Valid values are:" >&2
+            echo " - dev" >&2
+            echo " - private-dev" >&2
+            echo " - test" >&2
+            echo " - private-test" >&2
+            exit 1
+            ;;
+    esac
+    BASE="linz/${PACKAGECLOUD_REPOSITORY}/ubuntu/${dist}"
+    if test -n "${DRY_RUN}"
     then
-      echo "Cannot publish to packages without a PACKAGECLOUD_TOKEN" >&2
-      exit 1
+        echo "package_cloud push ${BASE} build-area/*.deb (dry-run)"
+    else
+        if test -z "${PACKAGECLOUD_TOKEN}"
+        then
+            echo "Cannot publish to packages without a PACKAGECLOUD_TOKEN" >&2
+            exit 1
+        fi
+        package_cloud push "${BASE}" build-area/*.deb || exit 1
     fi
-    package_cloud push "${BASE}" build-area/*.deb || exit 1
-  fi
 
 fi
 
@@ -245,100 +243,100 @@ fi
 if test -n "${GIT_TAG}"
 then
 
-  REMOTES_FILE=.unique-remotes
+    REMOTES_FILE=.unique-remotes
 
-  :> ${REMOTES_FILE}
-  if test -n "${PUSH_TO_GIT_REMOTE}"
-  then
-    echo "${PUSH_TO_GIT_REMOTE}" >> ${REMOTES_FILE}
-  fi
-
-  # git for-each-ref will return a format like:
-  #
-  #   remotes/origin/all-remote-branches
-  #   heads/all-remote-branches
-  #
-  git for-each-ref --points-at "${START_HASH}" \
-      --format='%(refname:lstrip=1)' \
-      refs/remotes/ refs/heads/ |
-  while read -r REF
-  do
-
-    if expr "$REF" : heads/ > /dev/null
+    : >${REMOTES_FILE}
+    if test -n "${PUSH_TO_GIT_REMOTE}"
     then
+        echo "${PUSH_TO_GIT_REMOTE}" >>${REMOTES_FILE}
+    fi
 
-      echo "--------------------------------------------------"
-      echo "Head ref pointing at start hash: ${REF}"
-      echo "--------------------------------------------------"
+    # git for-each-ref will return a format like:
+    #
+    #   remotes/origin/all-remote-branches
+    #   heads/all-remote-branches
+    #
+    git for-each-ref --points-at "${START_HASH}" \
+        --format='%(refname:lstrip=1)' \
+        refs/remotes/ refs/heads/ |
+        while read -r REF
+        do
 
-      HEAD="${REF//^heads\//}"
-      echo " Head: ${HEAD}"
+            if expr "$REF" : heads/ >/dev/null
+            then
 
-      if test "${HEAD}" = "${TMPBRANCH}"
-      then
-        echo " Skipping merge of tag to temp branch's head ${HEAD}"
-        continue
-      fi
+                echo "--------------------------------------------------"
+                echo "Head ref pointing at start hash: ${REF}"
+                echo "--------------------------------------------------"
 
-      echo " Merging temporary branch to head '${HEAD}'"
-      echo "git push ${GIT_DRY_RUN} . '${TMPBRANCH}':'${HEAD}'"
-      git push ${GIT_DRY_RUN} . "${TMPBRANCH}":"${HEAD}" || exit 1
+                HEAD="${REF//^heads\//}"
+                echo " Head: ${HEAD}"
 
-    elif expr "$REF" : remotes/ > /dev/null
-    then
+                if test "${HEAD}" = "${TMPBRANCH}"
+                then
+                    echo " Skipping merge of tag to temp branch's head ${HEAD}"
+                    continue
+                fi
 
-      echo "--------------------------------------------------"
-      echo "Remote ref pointing at start hash: ${REF}"
-      echo "--------------------------------------------------"
+                echo " Merging temporary branch to head '${HEAD}'"
+                echo "git push ${GIT_DRY_RUN} . '${TMPBRANCH}':'${HEAD}'"
+                git push ${GIT_DRY_RUN} . "${TMPBRANCH}":"${HEAD}" || exit 1
 
-      REMOTE_NAME="${REF#*/}"
-      REMOTE_NAME="${REMOTE_NAME%%/*}"
-      echo " Remote name: ${REMOTE_NAME}"
+            elif expr "$REF" : remotes/ >/dev/null
+            then
 
-      BRANCH="${REF#*/}"
-      BRANCH="${BRANCH#*/}"
-      echo " Remote branch: ${BRANCH}"
+                echo "--------------------------------------------------"
+                echo "Remote ref pointing at start hash: ${REF}"
+                echo "--------------------------------------------------"
 
-      if test -z "${REMOTE_NAME}"
-      then
-        continue # something went wrong ?
-      fi
+                REMOTE_NAME="${REF#*/}"
+                REMOTE_NAME="${REMOTE_NAME%%/*}"
+                echo " Remote name: ${REMOTE_NAME}"
 
-      PUSH_TO=${PUSH_TO_GIT_REMOTE:-${REMOTE_NAME}}
-      echo " Remote to push to: $(printurl "${PUSH_TO}")"
+                BRANCH="${REF#*/}"
+                BRANCH="${BRANCH#*/}"
+                echo " Remote branch: ${BRANCH}"
 
-      # Keep note of unique remote names for pushing tag
-      grep -qw "${PUSH_TO}" ${REMOTES_FILE} || {
-        echo " Saving remote '$(printurl "${PUSH_TO}")' to ${REMOTES_FILE}"
-        echo "${PUSH_TO}" >> ${REMOTES_FILE}
-      }
+                if test -z "${REMOTE_NAME}"
+                then
+                    continue # something went wrong ?
+                fi
 
-      if test "${BRANCH}" = "HEAD"
-      then
-        echo " Skipping push to remote's HEAD"
-        continue
-      fi
+                PUSH_TO=${PUSH_TO_GIT_REMOTE:-${REMOTE_NAME}}
+                echo " Remote to push to: $(printurl "${PUSH_TO}")"
 
-      echo "  Pushing debian changes to branch ${BRANCH} of remote $(printurl "${PUSH_TO}")"
-      git push ${GIT_DRY_RUN} "${PUSH_TO}" "${TMPBRANCH}:${BRANCH}" || exit 1
+                # Keep note of unique remote names for pushing tag
+                grep -qw "${PUSH_TO}" ${REMOTES_FILE} || {
+                    echo " Saving remote '$(printurl "${PUSH_TO}")' to ${REMOTES_FILE}"
+                    echo "${PUSH_TO}" >>${REMOTES_FILE}
+                }
 
+                if test "${BRANCH}" = "HEAD"
+                then
+                    echo " Skipping push to remote's HEAD"
+                    continue
+                fi
 
-    fi # is a remote ref
+                echo "  Pushing debian changes to branch ${BRANCH} of remote $(printurl "${PUSH_TO}")"
+                git push ${GIT_DRY_RUN} "${PUSH_TO}" "${TMPBRANCH}:${BRANCH}" || exit 1
 
-  done
+            fi
+            # is a remote ref
 
-  echo "--------------------------------------------------"
-  echo "Remotes to push tag to: $(printurl < "${REMOTES_FILE}" | tr '\n' ' ')"
-  echo "--------------------------------------------------"
+        done
 
-  while read -r PUSH_TO
-  do
-      test -z "${PUSH_TO}" && continue # skip empty lines
-      echo "--------------------------------------------------"
-      echo "Pushing tag ${GIT_TAG} to '$(printurl "${PUSH_TO}")'"
-      echo "--------------------------------------------------"
-      echo "git push ${GIT_DRY_RUN} \"$(printurl "${PUSH_TO}")\" ${GIT_TAG}:${GIT_TAG}"
-      git push ${GIT_DRY_RUN} "${PUSH_TO}" "${GIT_TAG}:${GIT_TAG}" || exit 1
-  done < ${REMOTES_FILE}
+    echo "--------------------------------------------------"
+    echo "Remotes to push tag to: $(printurl <"${REMOTES_FILE}" | tr '\n' ' ')"
+    echo "--------------------------------------------------"
+
+    while read -r PUSH_TO
+    do
+        test -z "${PUSH_TO}" && continue # skip empty lines
+        echo "--------------------------------------------------"
+        echo "Pushing tag ${GIT_TAG} to '$(printurl "${PUSH_TO}")'"
+        echo "--------------------------------------------------"
+        echo "git push ${GIT_DRY_RUN} \"$(printurl "${PUSH_TO}")\" ${GIT_TAG}:${GIT_TAG}"
+        git push ${GIT_DRY_RUN} "${PUSH_TO}" "${GIT_TAG}:${GIT_TAG}" || exit 1
+    done <${REMOTES_FILE}
 
 fi
