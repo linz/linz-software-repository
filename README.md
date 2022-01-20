@@ -99,8 +99,8 @@ If you want to also publish packages to packagecloud you'll need to pass appropr
     - uses: actions/checkout@v1
     - uses: linz/linz-software-repository@v4
       with:
+        packagecloud_repository: 'dev'
         packagecloud_token: ${{ secrets.PACKAGECLOUD_TOKEN }}
-        publish_to_repository: 'dev'
 
 When publishing to the 'test' repository the action will also try to push changes to
 debian/changelog file back to the origin, togheter with a `debian/xxx` tag. In order for the action
@@ -116,8 +116,8 @@ checked out depends on the action triggering the event). Protected branches can 
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}
     - uses: linz/linz-software-repository@v4
       with:
+        packagecloud_repository: 'test'
         packagecloud_token: ${{ secrets.PACKAGECLOUD_TOKEN }}
-        publish_to_repository: 'test'
 
 ## More info
 
