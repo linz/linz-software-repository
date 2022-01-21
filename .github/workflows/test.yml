@@ -29,3 +29,8 @@ jobs:
 
       - name: Build image
         run: nix-shell --pure --run 'make DISTRIBUTION=bionic image'
+
+      - name: Verify the distribution of the image
+        run:
+          nix-shell --pure --run 'docker run --entrypoint=grep linz-deb-builder:bionic
+          UBUNTU_CODENAME=bionic /etc/os-release'
