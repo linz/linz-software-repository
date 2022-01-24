@@ -55,8 +55,6 @@ cd "${srcdir}" || {
     exit 1
 }
 
-DRY_RUN=${DRY_RUN:-}
-
 git_dry_run=
 if test -n "${DRY_RUN}"
 then
