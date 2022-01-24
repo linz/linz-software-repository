@@ -11,7 +11,7 @@ on:
 
 jobs:
   test:
-    name: Test building Ubuntu ${{ matrix.distribution }} container on ${{ matrix.runner }}
+    name: Test building Ubuntu ${{ matrix.release }} container on ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
@@ -19,7 +19,7 @@ jobs:
           - ubuntu-18.04
           - ubuntu-20.04
           - ubuntu-latest
-        distribution:
+        release:
           - bionic
     env:
       NIX_PATH: 'nixpkgs=https://github.com/NixOS/nixpkgs/archive/a7ecde854aee5c4c7cd6177f54a99d2c1ff28a31.tar.gz'
@@ -27,14 +27,24 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v2.4.0
+        with:
+          fetch-depth: 0
 
       - name: Install Nix
         uses: cachix/install-nix-action@v16
 
-      - name: Build image
-        run: nix-shell --pure --run 'make DISTRIBUTION=${{ matrix.distribution }} image'
+      - name: Build builder image
+        run: nix-shell --pure --run 'docker build --tag=docker-builder .'
 
-      - name: Verify the distribution of the image
+      - name: Build and run runner image
         run:
-          nix-shell --pure --run 'docker run --entrypoint=grep linz-deb-builder:${{
-          matrix.distribution }} UBUNTU_CODENAME=${{ matrix.distribution }} /etc/os-release'
+          nix-shell --keep GITHUB_REPOSITORY --keep RUNNER_WORKSPACE --pure --run 'docker run
+          --env=DRY_RUN=1 --env=GITHUB_REPOSITORY --env=PACKAGECLOUD_REPOSITORY=dev
+          --env=PACKAGECLOUD_TOKEN=token --env=PUSH_TO_GIT_REMOTE=origin --env=RUNNER_WORKSPACE
+          --volume=/var/run/docker.sock:/var/run/docker.sock docker-builder ${{ matrix.release }}
+          "$PWD"'
+
+      - name: Verify the release of the runner image
+        run:
+          nix-shell --pure --run 'docker run --entrypoint=grep linz-deb-builder UBUNTU_CODENAME=${{
+          matrix.release }} /etc/os-release'
