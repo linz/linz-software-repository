@@ -38,8 +38,14 @@ RUN curl -s https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" \
     > /etc/apt/sources.list.d/pgdg.list
 
-RUN curl -s https://packagecloud.io/install/repositories/linz/test/script.deb.sh | bash
-RUN curl -s https://packagecloud.io/install/repositories/linz/prod/script.deb.sh | bash
+RUN wget https://packagecloud.io/install/repositories/linz/test/script.deb.sh \
+    && chmod u+x script.deb.sh \
+    && os=ubuntu dist=bionic ./script.deb.sh \
+    && rm script.deb.sh
+RUN wget https://packagecloud.io/install/repositories/linz/prod/script.deb.sh \
+    && chmod u+x script.deb.sh \
+    && os=ubuntu dist=bionic ./script.deb.sh \
+    && rm script.deb.sh
 
 
 # Install ruby2.3, for packagecloud
