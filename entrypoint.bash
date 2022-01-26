@@ -188,7 +188,7 @@ cat "$log_file"
 # gbp:info: Tagging Debian package 1.10.1-1-ga857db0-linz~bionic1 as debian/1.10.1-1-ga857db0-linz_bionic1 in git
 #
 git_tag=$(
-    grep 'Tagging Debian package .* as debian/' log.deb-build-binary |
+    grep 'Tagging Debian package .* as debian/' "$log_file" |
         sed 's@.* as debian/@debian/@;s@ in git$@@'
 )
 if test -n "${git_tag}"
