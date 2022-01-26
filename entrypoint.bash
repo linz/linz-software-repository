@@ -171,12 +171,17 @@ if test "${PACKAGECLOUD_REPOSITORY}" = "test" -o \
 then
     deb_build_binary_args=--git-tag
 fi
-deb-build-binary.bash "${deb_build_binary_args}" >log.deb-build-binary.bash ||
+log_file='log.deb-build-binary.bash'
+if [[ -e "$log_file" ]]
+then
+    rm "$log_file"
+fi
+deb-build-binary.bash "${deb_build_binary_args}" >"$log_file" ||
     {
-        cat log.deb-build-binary.bash
+        cat "$log_file"
         exit 1
     }
-cat log.deb-build-binary.bash
+cat "$log_file"
 
 # If tags are created, we'd get a message like this:
 #
