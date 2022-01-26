@@ -73,7 +73,7 @@ cleanup() {
     echo "|  CLEANING UP   |"
     echo " ----------------"
 
-    if test -n "${DRY_RUN}" -a -n "${git_tag}"
+    if test -n "${DRY_RUN-}" -a -n "${git_tag-}"
     then
         echo "--------------------------------------------------"
         echo "Removing debian tag (dry run)"
