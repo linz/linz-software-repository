@@ -147,7 +147,7 @@ trap 'cleanup' 0
 
 dch -D "${dist}" -v "${version}" "$msg" || exit 1
 
-git commit -m "[debian] Changelog update" debian/changelog || exit 1
+git commit --no-verify -m "[debian] Changelog update" debian/changelog || exit 1
 
 git show --pretty=fuller || exit 1
 
