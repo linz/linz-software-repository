@@ -189,7 +189,7 @@ cat "$log_file"
 #
 git_tag=$(
     grep 'Tagging Debian package .* as debian/' "$log_file" |
-        sed 's@.* as debian/@debian/@;s@ in git$@@'
+        sed 's@.* as debian/@debian/@;s@ in git$@@' || [[ $? -eq 1 ]]
 )
 if test -n "${git_tag}"
 then
