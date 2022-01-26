@@ -168,7 +168,7 @@ echo "------------------------------"
 deb_build_binary_args=
 if test "${PACKAGECLOUD_REPOSITORY}" = "test" -o \
     "${PACKAGECLOUD_REPOSITORY}" = "private-test"
-    then
+then
     deb_build_binary_args=--git-tag
 fi
 deb-build-binary.bash "${deb_build_binary_args}" >log.deb-build-binary.bash ||
