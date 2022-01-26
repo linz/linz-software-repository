@@ -73,7 +73,7 @@ cleanup() {
     echo "|  CLEANING UP   |"
     echo " ----------------"
 
-    if test -n "${DRY_RUN}" -a -n "${git_tag}"
+    if test -n "${DRY_RUN-}" -a -n "${git_tag-}"
     then
         echo "--------------------------------------------------"
         echo "Removing debian tag (dry run)"
@@ -147,7 +147,7 @@ trap 'cleanup' 0
 
 dch -D "${dist}" -v "${version}" "$msg" || exit 1
 
-git commit -m "[debian] Changelog update" debian/changelog || exit 1
+git commit --no-verify -m "[debian] Changelog update" debian/changelog || exit 1
 
 git show --pretty=fuller || exit 1
 
@@ -168,23 +168,28 @@ echo "------------------------------"
 deb_build_binary_args=
 if test "${PACKAGECLOUD_REPOSITORY}" = "test" -o \
     "${PACKAGECLOUD_REPOSITORY}" = "private-test"
-    then
+then
     deb_build_binary_args=--git-tag
 fi
-deb-build-binary.bash "${deb_build_binary_args}" >log.deb-build-binary.bash ||
+log_file='log.deb-build-binary.bash'
+if [[ -e "$log_file" ]]
+then
+    rm "$log_file"
+fi
+deb-build-binary.bash "${deb_build_binary_args}" >"$log_file" ||
     {
-        cat log.deb-build-binary.bash
+        cat "$log_file"
         exit 1
     }
-cat log.deb-build-binary.bash
+cat "$log_file"
 
 # If tags are created, we'd get a message like this:
 #
 # gbp:info: Tagging Debian package 1.10.1-1-ga857db0-linz~bionic1 as debian/1.10.1-1-ga857db0-linz_bionic1 in git
 #
 git_tag=$(
-    grep 'Tagging Debian package .* as debian/' log.deb-build-binary |
-        sed 's@.* as debian/@debian/@;s@ in git$@@'
+    grep 'Tagging Debian package .* as debian/' "$log_file" |
+        sed 's@.* as debian/@debian/@;s@ in git$@@' || [[ $? -eq 1 ]]
 )
 if test -n "${git_tag}"
 then
