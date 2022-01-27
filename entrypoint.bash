@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+set -o errexit -o noclobber -o nounset -o pipefail
+shopt -s failglob inherit_errexit
+
 printurl() {
     if test -z "$1"
     then
@@ -38,16 +41,16 @@ echo "   PUSH_TO_GIT_REMOTE [$(printurl "${PUSH_TO_GIT_REMOTE}")]"
 echo "      Git remote name or URL to push debian tag and"
 echo "      changes to, if PACKAGECLOUD_REPOSITORY=test."
 echo "      Defaults to the remotes pointing at HEAD ref."
-echo "   DRY_RUN [${DRY_RUN}]"
+echo "   DRY_RUN [${DRY_RUN-}]"
 echo "      Set to non-empty string to avoid publishing any"
 echo "      package and pushing any change/tag to remote."
 echo "----------------------------------------------------"
 echo
 
-cd /pkg || exit 1
+cd /pkg
 
 git_dry_run=
-if test -n "${DRY_RUN}"
+if test -n "${DRY_RUN-}"
 then
     git_dry_run=--dry-run
 fi
@@ -130,15 +133,15 @@ version="${tag}-linz~${dist}"
 echo "Using version: $version"
 echo "Hostname: ${HOSTNAME}"
 
-git checkout -b "${tmpbranch}" || exit 1
+git checkout -b "${tmpbranch}"
 
 trap 'cleanup' 0
 
-dch -D "${dist}" -v "${version}" "$msg" || exit 1
+dch -D "${dist}" -v "${version}" "$msg"
 
-git commit --no-verify -m "[debian] Changelog update" debian/changelog || exit 1
+git commit --no-verify -m "[debian] Changelog update" debian/changelog
 
-git show --pretty=fuller || exit 1
+git show --pretty=fuller
 
 echo "-------------------------------------"
 echo "Cleaning up build-area/"
@@ -149,7 +152,7 @@ rm -vrf build-area/
 echo "------------------------------"
 echo "Running deb-build-dependencies"
 echo "------------------------------"
-deb-build-dependencies.bash || exit 1
+deb-build-dependencies.bash
 
 echo "------------------------------"
 echo "Running deb-build-binary"
@@ -216,7 +219,7 @@ then
             ;;
     esac
     base="linz/${PACKAGECLOUD_REPOSITORY}/ubuntu/${dist}"
-    if test -n "${DRY_RUN}"
+    if test -n "${DRY_RUN-}"
     then
         echo "package_cloud push ${base} build-area/*.deb (dry-run)"
     else
@@ -225,7 +228,7 @@ then
             echo "Cannot publish to packages without a PACKAGECLOUD_TOKEN" >&2
             exit 1
         fi
-        package_cloud push "${base}" build-area/*.deb || exit 1
+        package_cloud push "${base}" build-area/*.deb
     fi
 
 fi
@@ -274,7 +277,7 @@ then
 
                 echo " Merging temporary branch to head '${head}'"
                 echo "git push ${git_dry_run} . '${tmpbranch}':'${head}'"
-                git push "${git_dry_run}" . "${tmpbranch}":"${head}" || exit 1
+                git push "${git_dry_run}" . "${tmpbranch}":"${head}"
 
             elif expr "$ref" : remotes/ >/dev/null
             then
@@ -312,7 +315,7 @@ then
                 fi
 
                 echo "  Pushing debian changes to branch ${branch} of remote $(printurl "${push_to}")"
-                git push "${git_dry_run}" "${push_to}" "${tmpbranch}:${branch}" || exit 1
+                git push "${git_dry_run}" "${push_to}" "${tmpbranch}:${branch}"
 
             fi
             # is a remote ref
@@ -330,7 +333,7 @@ then
         echo "Pushing tag ${git_tag} to '$(printurl "${push_to}")'"
         echo "--------------------------------------------------"
         echo "git push ${git_dry_run} \"$(printurl "${push_to}")\" ${git_tag}:${git_tag}"
-        git push "${git_dry_run}" "${push_to}" "${git_tag}:${git_tag}" || exit 1
+        git push "${git_dry_run}" "${push_to}" "${git_tag}:${git_tag}"
     done < "${remotes_file}"
 
 fi
