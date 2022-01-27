@@ -24,11 +24,6 @@ redact() {
 echo "----------------------------------------------------"
 echo "LINZ Software Packaging system"
 echo
-echo "Arguments: $*"
-echo
-echo "Supported Arguments:"
-echo "   <srcdir> dir containing source (defaults to /pkg)"
-echo
 echo "Supported Environment Variables:"
 echo "   PACKAGECLOUD_REPOSITORY [${PACKAGECLOUD_REPOSITORY}]"
 echo "      Packagecloud repository to push packages to."
@@ -49,11 +44,7 @@ echo "      package and pushing any change/tag to remote."
 echo "----------------------------------------------------"
 echo
 
-srcdir=${1-"/pkg"}
-cd "${srcdir}" || {
-    echo "Did you forget to mount package source to ${srcdir} ?" >&2
-    exit 1
-}
+cd /pkg || exit 1
 
 git_dry_run=
 if test -n "${DRY_RUN}"
