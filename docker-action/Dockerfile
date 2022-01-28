@@ -70,7 +70,7 @@ RUN gem update --system 3.0.6
 RUN gem install rake
 RUN gem install package_cloud
 
-
+# Avoid interactive prompts when running APT commands
 RUN echo "DEBIAN_FRONTEND=noninteractive" >> /etc/environment
 
 COPY bin/* /usr/local/bin/
