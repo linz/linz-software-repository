@@ -37,18 +37,18 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
-RUN wget https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+RUN wget --quiet https://www.postgresql.org/media/keys/ACCC4CF8.asc \
     && apt-key add ACCC4CF8.asc \
     && rm ACCC4CF8.asc
 
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" \
     > /etc/apt/sources.list.d/pgdg.list
 
-RUN wget https://packagecloud.io/install/repositories/linz/test/script.deb.sh \
+RUN wget --quiet https://packagecloud.io/install/repositories/linz/test/script.deb.sh \
     && chmod u+x script.deb.sh \
     && os=ubuntu dist=bionic ./script.deb.sh \
     && rm script.deb.sh
-RUN wget https://packagecloud.io/install/repositories/linz/prod/script.deb.sh \
+RUN wget --quiet https://packagecloud.io/install/repositories/linz/prod/script.deb.sh \
     && chmod u+x script.deb.sh \
     && os=ubuntu dist=bionic ./script.deb.sh \
     && rm script.deb.sh
