@@ -19,7 +19,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 # hadolint ignore=DL3008
 RUN apt-get update \
-    && apt-get install -y \
+    && apt-get install --assume-yes \
         apt-transport-https \
         build-essential \
         ca-certificates \
@@ -53,10 +53,10 @@ RUN wget https://packagecloud.io/install/repositories/linz/prod/script.deb.sh \
 
 
 # Install ruby2.3, for packagecloud
-RUN add-apt-repository -y ppa:brightbox/ruby-ng
+RUN add-apt-repository --yes ppa:brightbox/ruby-ng
 # hadolint ignore=DL3008
 RUN apt-get update \
-    && apt-get -y install ruby ruby-dev \
+    && apt-get --assume-yes install ruby ruby-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
