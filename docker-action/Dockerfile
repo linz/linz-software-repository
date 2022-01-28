@@ -66,9 +66,10 @@ RUN apt-get update \
 ## see https://github.com/rubygems/rubygems/issues/3068#issuecomment-574775885
 ENV REALLY_GEM_UPDATE_SYSTEM=1
 ## 3.0.6
-RUN gem update --system 3.0.6
-RUN gem install rake
-RUN gem install package_cloud
+COPY Gemfile Gemfile.lock /tmp/
+RUN gem update --system 3.0.6 \
+    && gem install bundler:2.3.6 \
+    && bundle install --gemfile=/tmp/Gemfile
 
 # Avoid interactive prompts when running APT commands
 RUN echo "DEBIAN_FRONTEND=noninteractive" >> /etc/environment
