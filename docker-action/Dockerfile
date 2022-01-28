@@ -17,6 +17,7 @@ FROM ubuntu:${DISTRIBUTION}
 
 ENV DEBIAN_FRONTEND noninteractive
 
+# hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y \
     apt-transport-https \
     build-essential \
@@ -50,6 +51,7 @@ RUN wget https://packagecloud.io/install/repositories/linz/prod/script.deb.sh \
 
 # Install ruby2.3, for packagecloud
 RUN add-apt-repository -y ppa:brightbox/ruby-ng
+# hadolint ignore=DL3008
 RUN apt-get update && apt-get -y install ruby ruby-dev
 
 ## Workaround for packagecloud tool bug,
