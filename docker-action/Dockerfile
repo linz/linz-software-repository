@@ -71,7 +71,7 @@ RUN gem install package_cloud
 
 RUN echo "DEBIAN_FRONTEND=noninteractive" >> /etc/environment
 
-ADD bin/* /usr/local/bin/
+COPY bin/* /usr/local/bin/
 RUN chmod 755 /usr/local/bin/*
 
 COPY entrypoint.bash /
