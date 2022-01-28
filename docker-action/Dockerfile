@@ -37,7 +37,9 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
-RUN curl -s https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+RUN wget https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+    && apt-key add ACCC4CF8.asc \
+    && rm ACCC4CF8.asc
 
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" \
     > /etc/apt/sources.list.d/pgdg.list
