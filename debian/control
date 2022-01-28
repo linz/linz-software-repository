@@ -1,0 +1,11 @@
+Source: dummy
+Maintainer: No Name <nobody@example.org>
+Standards-Version: 4.6.0
+Build-Depends: bash
+Section: misc
+Priority: optional
+
+Package: dummy
+Architecture: all
+Description: Package for testing this repo.
+ This is a dummy package, and is deliberately empty.

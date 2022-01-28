@@ -1,1 +1,3 @@
 /.idea/
+/build-area/
+/log.deb-build-binary.bash
