@@ -5,10 +5,9 @@
 name: 'LINZ Debian Packaging'
 description: 'Build Debian packages for LINZ software repository'
 inputs:
-  repo:
-    description: 'Path to source repository of project to build packages of'
-    required: false
-    default: '/github/workspace'
+  release:
+    description: Base Ubuntu Docker image version to build within, for example '20.04' or 'hirsute'
+    required: true
   packagecloud_token:
     description: 'Package Cloud API Token'
     required: false
@@ -26,7 +25,7 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ inputs.repo }}
+    - ${{ inputs.release }}
   env:
     PACKAGECLOUD_TOKEN: '${{ inputs.packagecloud_token }}'
     PACKAGECLOUD_REPOSITORY: '${{ inputs.packagecloud_repository }}'
