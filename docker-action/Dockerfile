@@ -32,7 +32,9 @@ RUN apt-get update \
         lsb-release \
         make \
         software-properties-common \
-        wget
+        wget \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 RUN curl -s https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
@@ -54,7 +56,9 @@ RUN wget https://packagecloud.io/install/repositories/linz/prod/script.deb.sh \
 RUN add-apt-repository -y ppa:brightbox/ruby-ng
 # hadolint ignore=DL3008
 RUN apt-get update \
-    && apt-get -y install ruby ruby-dev
+    && apt-get -y install ruby ruby-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 ## Workaround for packagecloud tool bug,
 ## see https://github.com/rubygems/rubygems/issues/3068#issuecomment-574775885
