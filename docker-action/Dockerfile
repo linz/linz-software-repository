@@ -19,7 +19,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 # hadolint ignore=DL3008
 RUN apt-get update \
-    && apt-get install --assume-yes \
+    && apt-get --assume-yes install \
         apt-transport-https \
         build-essential \
         ca-certificates \
