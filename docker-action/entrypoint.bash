@@ -126,7 +126,8 @@ git config --global user.email "${last_committer_email}"
 git config --global user.name "${last_committer_name}"
 
 msg="New version"                          #TODO: tweak this (take as param?)
-tag=$(git describe --tags --match '[^d]*') # excluding debian/* tags
+last_version_tag="$(git describe --tags --match '[^d]*')"
+tag="${last_version_tag#v}"
 dist=$(lsb_release -cs)
 version="${tag}-linz~${dist}"
 
