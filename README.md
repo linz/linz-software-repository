@@ -47,3 +47,24 @@ steps:
       packagecloud_repository: 'test'
       packagecloud_token: ${{ secrets.PACKAGECLOUD_TOKEN }}
 ```
+
+## Release procedure
+
+Using the above, how do you actually release? If you want to release a release:
+
+1. Go to the relevant repository.
+2. Check `git tag` for the latest released version.
+3. Depending on whether this is a major (X+1.0.0), minor (X.Y+1.0), or patch (X.Y.Z+1) release:
+   - If this is a major or minor release, create a `release-X.Y` branch.
+   - If this is a patch release, check out the existing `release-X.Y` branch.
+4. Add a change log entry to `CHANGELOG.md`.
+5. Look for anywhere there is a list of version numbers, such as the Makefile, test files, or
+   others. In all those places, add your new version and add an issue to fix it so that the code
+   looks up all the relevant versions by their tags.
+6. Do your changes on this branch.
+7. When you're ready to release, tag the final commit on the branch with `X.Y.Z`, for example,
+   `1.10.2`.
+8. `git push --atomic origin "$(git branch --show-current)" TAG` with the tag created above.
+9. Create a pull request from the branch.
+10. Wait for the package to appear in the [test repository](https://packagecloud.io/linz/test).
+11. Manually promote the package from the test repository to production.
