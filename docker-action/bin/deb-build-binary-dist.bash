@@ -18,8 +18,10 @@ buildbranch=pkg-build-dist-$dist-$(date +%s)
 git branch "$buildbranch"
 git checkout "$buildbranch"
 
+last_version_tag="$(git tag --sort=version:refname | grep --invert-match debian | tail --lines=1)"
+version="${last_version_tag#v}"
 dch \
-    --newversion "$(git tag --sort=version:refname | grep -v debian | tail -n 1)-1linz~${dist}1" \
+    --newversion "${version}-1linz~${dist}1" \
     --distribution "$dist" \
     "Package rebuild for $dist"
 
