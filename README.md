@@ -29,7 +29,7 @@ steps:
 ```
 
 When publishing to the 'test' repository the action will also try to push changes to
-debian/changelog file back to the origin, togheter with a `debian/xxx` tag. In order for the action
+debian/changelog file back to the origin, together with a `debian/xxx` tag. In order for the action
 to have credentials to push these objects you'll need to set the "origin" url to include the
 authentication token. Note that the token must belong to a user who has permissions to push to all
 branches containing the initial reference from the checked out repository (which reference is
