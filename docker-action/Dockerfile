@@ -46,11 +46,11 @@ RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg m
 
 RUN wget --quiet https://packagecloud.io/install/repositories/linz/test/script.deb.sh \
     && chmod u+x script.deb.sh \
-    && os=ubuntu dist=bionic ./script.deb.sh \
+    && os=ubuntu dist=focal ./script.deb.sh \
     && rm script.deb.sh
 RUN wget --quiet https://packagecloud.io/install/repositories/linz/prod/script.deb.sh \
     && chmod u+x script.deb.sh \
-    && os=ubuntu dist=bionic ./script.deb.sh \
+    && os=ubuntu dist=focal ./script.deb.sh \
     && rm script.deb.sh
 
 
