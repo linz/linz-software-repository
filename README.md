@@ -62,9 +62,10 @@ Using the above, how do you actually release? If you want to release a release:
    others. In all those places, add your new version and add an issue to fix it so that the code
    looks up all the relevant versions by their tags.
 6. Do your changes on this branch.
-7. When you're ready to release, tag the final commit on the branch with `X.Y.Z`, for example,
-   `1.10.2`.
-8. `git push --atomic origin "$(git branch --show-current)" TAG` with the tag created above.
-9. Create a pull request from the branch.
-10. Wait for the package to appear in the [test repository](https://packagecloud.io/linz/test).
-11. Manually promote the package from the test repository to production.
+7. Push the branch.
+8. Create a pull request for the branch.
+9. Wait for the pull request to build and merge.
+10. Tag the final commit on the branch with `X.Y.Z`, for example, `1.10.2`.
+11. `git push TAG` with the tag created above.
+12. Wait for the package to appear in the [test repository](https://packagecloud.io/linz/test).
+13. Manually promote the package from the test repository to production.
