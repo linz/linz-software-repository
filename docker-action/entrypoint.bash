@@ -157,18 +157,17 @@ deb-build-dependencies.bash
 echo "------------------------------"
 echo "Running deb-build-binary"
 echo "------------------------------"
-deb_build_binary_args=
 if test "${PACKAGECLOUD_REPOSITORY}" = "test" -o \
     "${PACKAGECLOUD_REPOSITORY}" = "private-test"
 then
-    deb_build_binary_args=--git-tag
+    deb_build_binary_args=(--git-tag)
 fi
 log_file='log.deb-build-binary.bash'
 if [[ -e "$log_file" ]]
 then
     rm "$log_file"
 fi
-deb-build-binary.bash "${deb_build_binary_args}" >"$log_file" ||
+deb-build-binary.bash "${deb_build_binary_args[@]}" >"$log_file" ||
     {
         cat "$log_file"
         exit 1
