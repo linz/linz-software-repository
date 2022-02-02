@@ -53,19 +53,20 @@ steps:
 Using the above, how do you actually release? If you want to release a release:
 
 1. Go to the relevant repository.
-2. Check `git tag` for the latest released version.
-3. Depending on whether this is a major (X+1.0.0), minor (X.Y+1.0), or patch (X.Y.Z+1) release:
+1. Update local tags using `git fetch --tags`.
+1. Check `git tag` for the latest released version.
+1. Depending on whether this is a major (X+1.0.0), minor (X.Y+1.0), or patch (X.Y.Z+1) release:
    - If this is a major or minor release, create a `release-X.Y` branch.
    - If this is a patch release, check out the existing `release-X.Y` branch.
-4. Add a change log entry to `CHANGELOG.md`.
-5. Look for anywhere there is a list of version numbers, such as the Makefile, test files, or
+1. Add a change log entry to `CHANGELOG.md`.
+1. Look for anywhere there is a list of version numbers, such as the Makefile, test files, or
    others. In all those places, add your new version and add an issue to fix it so that the code
    looks up all the relevant versions by their tags.
-6. Do your changes on this branch.
-7. Push the branch.
-8. Create a pull request for the branch.
-9. Wait for the pull request to build and merge.
-10. Tag the final commit on the branch with `X.Y.Z`, for example, `1.10.2`.
-11. `git push TAG` with the tag created above.
-12. Wait for the package to appear in the [test repository](https://packagecloud.io/linz/test).
-13. Manually promote the package from the test repository to production.
+1. Do your changes on this branch.
+1. Push the branch.
+1. Create a pull request for the branch.
+1. Wait for the pull request to build and merge.
+1. Tag the final commit on the branch with `X.Y.Z`, for example, `1.10.2`.
+1. `git push origin TAG` with the tag created above.
+1. Wait for the package to appear in the [test repository](https://packagecloud.io/linz/test).
+1. Manually promote the package from the test repository to production.
