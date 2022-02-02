@@ -71,3 +71,6 @@ Using the above, how do you actually release? If you want to release a release:
 1. Wait for the package to appear in the [test repository](https://packagecloud.io/linz/test).
 1. Manually promote the package from the test repository to production.
 1. Wait for the pull request to build with the Debian packaging changelog commit and merge it.
+
+Only at this point is it safe to rely on the new version, because dependee repositories rely on the
+state of the `master` branch in their pipelines. :'(
