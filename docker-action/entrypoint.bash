@@ -49,10 +49,9 @@ echo
 
 cd /pkg
 
-git_dry_run=
 if test -n "${DRY_RUN-}"
 then
-    git_dry_run=--dry-run
+    git_dry_run=(--dry-run)
 fi
 
 PATH=$PATH:/usr/local/sbin:/usr/sbin:/sbin:
@@ -277,8 +276,8 @@ then
                 fi
 
                 echo " Merging temporary branch to head '${head}'"
-                echo "git push ${git_dry_run} . '${tmpbranch}':'${head}'"
-                git push "${git_dry_run}" . "${tmpbranch}":"${head}"
+                echo "git push ${git_dry_run[*]} . '${tmpbranch}':'${head}'"
+                git push "${git_dry_run[@]}" . "${tmpbranch}":"${head}"
 
             elif expr "$ref" : remotes/ >/dev/null
             then
@@ -316,7 +315,7 @@ then
                 fi
 
                 echo "  Pushing debian changes to branch ${branch} of remote $(printurl "${push_to}")"
-                git push "${git_dry_run}" "${push_to}" "${tmpbranch}:${branch}"
+                git push "${git_dry_run[@]}" "${push_to}" "${tmpbranch}:${branch}"
 
             fi
             # is a remote ref
@@ -333,8 +332,8 @@ then
         echo "--------------------------------------------------"
         echo "Pushing tag ${git_tag} to '$(printurl "${push_to}")'"
         echo "--------------------------------------------------"
-        echo "git push ${git_dry_run} \"$(printurl "${push_to}")\" ${git_tag}:${git_tag}"
-        git push "${git_dry_run}" "${push_to}" "${git_tag}:${git_tag}"
+        echo "git push ${git_dry_run[*]} \"$(printurl "${push_to}")\" ${git_tag}:${git_tag}"
+        git push "${git_dry_run[@]}" "${push_to}" "${git_tag}:${git_tag}"
     done < "${remotes_file}"
 
 fi
