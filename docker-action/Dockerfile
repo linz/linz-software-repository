@@ -72,7 +72,7 @@ RUN gem update --system 3.0.6 \
     && bundle install --gemfile=/tmp/Gemfile
 
 # Avoid interactive prompts when running APT commands
-RUN echo "DEBIAN_FRONTEND=noninteractive" >> /etc/environment
+ENV DEBIAN_FRONTEND=noninteractive
 
 COPY bin/* /usr/local/bin/
 RUN chmod 755 /usr/local/bin/*
