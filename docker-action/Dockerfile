@@ -31,6 +31,8 @@ RUN apt-get update \
         gnupg \
         lsb-release \
         make \
+        ruby \
+        ruby-dev \
         software-properties-common \
         wget \
     && apt-get clean \
@@ -53,22 +55,8 @@ RUN wget --quiet https://packagecloud.io/install/repositories/linz/prod/script.d
     && os=ubuntu dist=focal ./script.deb.sh \
     && rm script.deb.sh
 
-
-# Install ruby2.3, for packagecloud
-RUN add-apt-repository --yes ppa:brightbox/ruby-ng
-# hadolint ignore=DL3008
-RUN apt-get update \
-    && apt-get --assume-yes install --no-install-recommends ruby ruby-dev \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
-## Workaround for packagecloud tool bug,
-## see https://github.com/rubygems/rubygems/issues/3068#issuecomment-574775885
-ENV REALLY_GEM_UPDATE_SYSTEM=1
-## 3.0.6
 COPY Gemfile Gemfile.lock /tmp/
-RUN gem update --system 3.0.6 \
-    && gem install bundler:2.3.6 \
+RUN gem install bundler:2.3.6 \
     && bundle install --gemfile=/tmp/Gemfile
 
 # Avoid interactive prompts when running APT commands
