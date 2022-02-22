@@ -19,10 +19,10 @@ SHELL ["/bin/bash", "-o", "errexit", "-o", "pipefail", "-c"]
 
 ENV DEBIAN_FRONTEND noninteractive
 
+ARG EXTRA_PACKAGES
 # hadolint ignore=DL3008
 RUN apt-get update \
     && apt-get --assume-yes install --no-install-recommends \
-        apt-transport-https \
         build-essential \
         ca-certificates \
         curl \
@@ -31,12 +31,9 @@ RUN apt-get update \
         git \
         git-buildpackage \
         gnupg \
-        jq \
         lsb-release \
-        make \
-        ruby \
         ruby-dev \
-        software-properties-common \
+        ${EXTRA_PACKAGES} \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

@@ -56,9 +56,14 @@ jobs:
           --env=DRY_RUN=1 --env=GITHUB_REPOSITORY --env=PACKAGECLOUD_REPOSITORY=dev
           --env=PACKAGECLOUD_TOKEN=token --env=PUSH_TO_GIT_REMOTE=origin --env=RUNNER_WORKSPACE
           --volume=/var/run/docker.sock:/var/run/docker.sock docker-builder ${{ matrix.release }}
-          "$PWD"'
+          "cowsay hello" "$PWD"'
 
       - name: Verify the release of the runner image
         run:
           nix-shell --pure --run 'docker run --entrypoint=grep linz-deb-builder UBUNTU_CODENAME=${{
           matrix.release }} /etc/os-release'
+
+      - name: Verify the packages on the runner image
+        run:
+          nix-shell --pure --run 'docker run --entrypoint=bash linz-deb-builder -o pipefail -c
+          "hello | /usr/games/cowthink"'
