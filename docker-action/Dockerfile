@@ -15,6 +15,8 @@
 ARG DISTRIBUTION
 FROM ubuntu:${DISTRIBUTION}
 
+SHELL ["/bin/bash", "-o", "errexit", "-o", "pipefail", "-c"]
+
 ENV DEBIAN_FRONTEND noninteractive
 
 # hadolint ignore=DL3008
@@ -35,26 +37,19 @@ RUN apt-get update \
         ruby \
         ruby-dev \
         software-properties-common \
-        wget \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
-RUN wget --quiet https://www.postgresql.org/media/keys/ACCC4CF8.asc \
-    && apt-key add ACCC4CF8.asc \
-    && rm ACCC4CF8.asc
+RUN curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
 
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" \
     > /etc/apt/sources.list.d/pgdg.list
 
-RUN wget --quiet https://packagecloud.io/install/repositories/linz/test/script.deb.sh \
-    && chmod u+x script.deb.sh \
-    && os=ubuntu dist=focal ./script.deb.sh \
-    && rm script.deb.sh
-RUN wget --quiet https://packagecloud.io/install/repositories/linz/prod/script.deb.sh \
-    && chmod u+x script.deb.sh \
-    && os=ubuntu dist=focal ./script.deb.sh \
-    && rm script.deb.sh
+RUN curl https://packagecloud.io/install/repositories/linz/test/script.deb.sh | \
+    os=ubuntu dist=focal bash
+RUN curl https://packagecloud.io/install/repositories/linz/prod/script.deb.sh | \
+    os=ubuntu dist=focal bash
 
 COPY Gemfile Gemfile.lock /tmp/
 RUN gem install bundler:2.3.6 \
