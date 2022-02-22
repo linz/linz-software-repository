@@ -24,28 +24,30 @@ redact() {
     fi
 }
 
-echo "----------------------------------------------------"
-echo "LINZ Software Packaging system"
-echo
-echo "Supported Environment Variables:"
-echo "   PACKAGECLOUD_REPOSITORY [${PACKAGECLOUD_REPOSITORY}]"
-echo "      Packagecloud repository to push packages to."
-echo "      Can be 'test', 'dev' or empty (default)"
-echo "      for not publishing them at all."
-echo "      Targetting 'test' also creates a debian tag"
-echo "      and pushes changes to determined git remote"
-echo "   PACKAGECLOUD_TOKEN [$(redact "${PACKAGECLOUD_TOKEN}")]"
-echo "      Token to authorize publishing to packagecloud."
-echo "      Only needed if PACKAGECLOUD_REPOSITORY is not empty."
-echo "   PUSH_TO_GIT_REMOTE [$(printurl "${PUSH_TO_GIT_REMOTE}")]"
-echo "      Git remote name or URL to push debian tag and"
-echo "      changes to, if PACKAGECLOUD_REPOSITORY=test."
-echo "      Defaults to the remotes pointing at HEAD ref."
-echo "   DRY_RUN [${DRY_RUN-}]"
-echo "      Set to non-empty string to avoid publishing any"
-echo "      package and pushing any change/tag to remote."
-echo "----------------------------------------------------"
-echo
+cat << EOF
+----------------------------------------------------
+LINZ Software Packaging system
+
+Supported Environment Variables:
+   PACKAGECLOUD_REPOSITORY [${PACKAGECLOUD_REPOSITORY}]
+      Packagecloud repository to push packages to.
+      Can be 'test', 'dev' or empty (default)
+      for not publishing them at all.
+      Targetting 'test' also creates a debian tag
+      and pushes changes to determined git remote
+   PACKAGECLOUD_TOKEN [$(redact "${PACKAGECLOUD_TOKEN}")]
+      Token to authorize publishing to packagecloud.
+      Only needed if PACKAGECLOUD_REPOSITORY is not empty.
+   PUSH_TO_GIT_REMOTE [$(printurl "${PUSH_TO_GIT_REMOTE}")]
+      Git remote name or URL to push debian tag and
+      changes to, if PACKAGECLOUD_REPOSITORY=test.
+      Defaults to the remotes pointing at HEAD ref.
+   DRY_RUN [${DRY_RUN-}]
+      Set to non-empty string to avoid publishing any
+      package and pushing any change/tag to remote.
+----------------------------------------------------
+
+EOF
 
 cd /pkg
 
@@ -60,37 +62,52 @@ tmpbranch=pkg-dev-${HOSTNAME}
 
 cleanup() {
 
-    echo " ----------------"
-    echo "|  CLEANING UP   |"
-    echo " ----------------"
+    cat << 'EOF'
+ ----------------
+|  CLEANING UP   |
+ ----------------
+EOF
 
     if test -n "${DRY_RUN-}" -a -n "${git_tag-}"
     then
-        echo "--------------------------------------------------"
-        echo "Removing debian tag (dry run)"
-        echo "--------------------------------------------------"
+        cat << 'EOF'
+--------------------------------------------------
+Removing debian tag (dry run)
+--------------------------------------------------
+EOF
         git tag -d "${git_tag}"
     fi
 
-    echo "--------------------------------------------------"
-    echo "Checking out previous branch"
-    echo "--------------------------------------------------"
+    cat << 'EOF'
+--------------------------------------------------
+Checking out previous branch
+--------------------------------------------------
+EOF
+
     git checkout -
 
-    echo "--------------------------------------------------"
-    echo "Removing temporary branch"
-    echo "--------------------------------------------------"
+    cat << 'EOF'
+--------------------------------------------------
+Removing temporary branch
+--------------------------------------------------
+EOF
+
     git branch -D "${tmpbranch}"
 
-    echo "--------------------------------------------------"
-    echo "Giving ownership of all files to ${repo_owner}"
-    echo "--------------------------------------------------"
+    cat << EOF
+--------------------------------------------------
+Giving ownership of all files to ${repo_owner}
+--------------------------------------------------
+EOF
+
     chown -R "${repo_owner}" .
 }
 
-echo "------------------------------"
-echo "Extract git information"
-echo "------------------------------"
+cat << 'EOF'
+------------------------------
+Extract git information
+------------------------------
+EOF
 
 #echo "# git status"
 #git status
@@ -111,9 +128,11 @@ echo "Start hash (rev-parse HEAD): ${start_hash}"
 repo_owner="$(find .git -maxdepth 0 -printf %u)"
 echo "Repository owner: ${repo_owner}"
 
-echo "------------------------------"
-echo "Updating Debian changelog"
-echo "------------------------------"
+cat << 'EOF'
+------------------------------
+Updating Debian changelog
+------------------------------
+EOF
 
 last_committer_name=$(git --no-pager show -s --format='%cn' HEAD)
 last_committer_email=$(git --no-pager show -s --format='%ce' HEAD)
@@ -130,8 +149,10 @@ tag="${last_version_tag#v}"
 dist=$(lsb_release -cs)
 version="${tag}-linz~${dist}"
 
-echo "Using version: $version"
-echo "Hostname: ${HOSTNAME}"
+cat << EOF
+Using version: $version
+Hostname: ${HOSTNAME}
+EOF
 
 git checkout -b "${tmpbranch}"
 
@@ -143,20 +164,26 @@ git commit --no-verify -m "[debian] Changelog update" debian/changelog
 
 git show --pretty=fuller
 
-echo "-------------------------------------"
-echo "Cleaning up build-area/"
-echo "-------------------------------------"
+cat << 'EOF'
+-------------------------------------
+Cleaning up build-area/
+-------------------------------------
+EOF
 
 rm -vrf build-area/
 
-echo "------------------------------"
-echo "Running deb-build-dependencies"
-echo "------------------------------"
+cat << 'EOF'
+------------------------------
+Running deb-build-dependencies
+------------------------------
+EOF
 deb-build-dependencies.bash
 
-echo "------------------------------"
-echo "Running deb-build-binary"
-echo "------------------------------"
+cat << 'EOF'
+------------------------------
+Running deb-build-binary
+------------------------------
+EOF
 if test "${PACKAGECLOUD_REPOSITORY}" = "test" -o \
     "${PACKAGECLOUD_REPOSITORY}" = "private-test"
 then
@@ -187,9 +214,11 @@ then
     echo "GIT TAG ${git_tag} created"
 fi
 
-echo "-------------------------------------"
-echo "List packages now in build-area/"
-echo "-------------------------------------"
+cat << 'EOF'
+-------------------------------------
+List packages now in build-area/
+-------------------------------------
+EOF
 
 ls -l build-area/*.deb
 
@@ -200,20 +229,24 @@ ls -l build-area/*.deb
 if test -n "${PACKAGECLOUD_REPOSITORY}"
 then
 
-    echo "--------------------------------------------------"
-    echo "Publishing packages to packagecloud ${PACKAGECLOUD_REPOSITORY}"
-    echo "--------------------------------------------------"
+cat << EOF
+--------------------------------------------------
+Publishing packages to packagecloud ${PACKAGECLOUD_REPOSITORY}
+--------------------------------------------------
+EOF
 
     case "${PACKAGECLOUD_REPOSITORY}" in
         dev | test | private-dev | private-test)
             ;;
         *)
-            echo "Invalid packagecloud repository ${PACKAGECLOUD_REPOSITORY}" >&2
-            echo "Valid values are:" >&2
-            echo " - dev" >&2
-            echo " - private-dev" >&2
-            echo " - test" >&2
-            echo " - private-test" >&2
+            cat << EOF >&2
+Invalid packagecloud repository ${PACKAGECLOUD_REPOSITORY}
+Valid values are:
+ - dev
+ - private-dev
+ - test
+ - private-test
+EOF
             exit 1
             ;;
     esac
@@ -261,9 +294,11 @@ then
             if expr "$ref" : heads/ >/dev/null
             then
 
-                echo "--------------------------------------------------"
-                echo "Head ref pointing at start hash: ${ref}"
-                echo "--------------------------------------------------"
+                cat << EOF
+--------------------------------------------------
+Head ref pointing at start hash: ${ref}
+--------------------------------------------------
+EOF
 
                 head="${ref//^heads\//}"
                 echo " Head: ${head}"
@@ -281,9 +316,11 @@ then
             elif expr "$ref" : remotes/ >/dev/null
             then
 
-                echo "--------------------------------------------------"
-                echo "Remote ref pointing at start hash: ${ref}"
-                echo "--------------------------------------------------"
+                cat << EOF
+--------------------------------------------------
+Remote ref pointing at start hash: ${ref}
+--------------------------------------------------
+EOF
 
                 remote_name="${ref#*/}"
                 remote_name="${remote_name%%/*}"
@@ -321,17 +358,21 @@ then
 
         done
 
-    echo "--------------------------------------------------"
-    echo "Remotes to push tag to: $(printurl <"${remotes_file}" | tr '\n' ' ')"
-    echo "--------------------------------------------------"
+    cat << EOF
+--------------------------------------------------
+Remotes to push tag to: $(printurl <"${remotes_file}" | tr '\n' ' ')
+--------------------------------------------------
+EOF
 
     while read -r push_to
     do
         test -z "${push_to}" && continue # skip empty lines
-        echo "--------------------------------------------------"
-        echo "Pushing tag ${git_tag} to '$(printurl "${push_to}")'"
-        echo "--------------------------------------------------"
-        echo "git push ${git_dry_run[*]} \"$(printurl "${push_to}")\" ${git_tag}:${git_tag}"
+        cat << EOF
+--------------------------------------------------
+Pushing tag ${git_tag} to '$(printurl "${push_to}")'
+--------------------------------------------------
+git push ${git_dry_run[*]} "$(printurl "${push_to}")" ${git_tag}:${git_tag}
+EOF
         git push "${git_dry_run[@]}" "${push_to}" "${git_tag}:${git_tag}"
     done < "${remotes_file}"
 
