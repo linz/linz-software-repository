@@ -29,6 +29,7 @@ RUN apt-get update \
         git \
         git-buildpackage \
         gnupg \
+        jq \
         lsb-release \
         make \
         ruby \
