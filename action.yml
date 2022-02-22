@@ -10,7 +10,8 @@ inputs:
     required: true
   packages:
     description: Extra packages required to build this package
-    required: true
+    required: false
+    default: ''
   packagecloud_token:
     description: 'Package Cloud API Token'
     required: false
