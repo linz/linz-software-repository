@@ -52,8 +52,6 @@ COPY Gemfile Gemfile.lock /tmp/
 RUN gem install bundler:2.3.6 \
     && bundle install --gemfile=/tmp/Gemfile
 
-# Avoid interactive prompts when running APT commands
-ENV DEBIAN_FRONTEND=noninteractive
 
 COPY bin/* /usr/local/bin/
 RUN chmod 755 /usr/local/bin/*
