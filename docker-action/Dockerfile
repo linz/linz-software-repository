@@ -52,6 +52,7 @@ COPY Gemfile Gemfile.lock /tmp/
 RUN gem install bundler:2.3.6 \
     && bundle install --gemfile=/tmp/Gemfile
 
+ENV LC_CTYPE=C.UTF-8
 
 COPY bin/* /usr/local/bin/
 RUN chmod 755 /usr/local/bin/*
