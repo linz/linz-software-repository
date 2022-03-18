@@ -51,7 +51,7 @@ EOF
 
 cd /pkg
 
-if test -n "${DRY_RUN-}"
+if [[ -n "${DRY_RUN-}" ]]
 then
     git_dry_run=(--dry-run)
 fi
@@ -68,7 +68,7 @@ cleanup() {
  ----------------
 EOF
 
-    if test -n "${DRY_RUN-}" -a -n "${git_tag-}"
+    if [[ -n "${DRY_RUN-}" ]] && [[ -n "${git_tag-}" ]]
     then
         cat << 'EOF'
 --------------------------------------------------
@@ -208,7 +208,7 @@ git_tag=$(
     grep 'Tagging Debian package .* as debian/' "$log_file" |
         sed 's@.* as debian/@debian/@;s@ in git$@@' || [[ $? -eq 1 ]]
 )
-if test -n "${git_tag}"
+if [[ -n "${git_tag}" ]]
 then
     echo "GIT TAG ${git_tag} created"
 fi
@@ -228,7 +228,7 @@ ls -l build-area/*.deb
 if [[ -n "${PACKAGECLOUD_REPOSITORY-}" ]]
 then
 
-cat << EOF
+    cat << EOF
 --------------------------------------------------
 Publishing packages to packagecloud ${PACKAGECLOUD_REPOSITORY}
 --------------------------------------------------
@@ -250,7 +250,7 @@ EOF
             ;;
     esac
     base="linz/${PACKAGECLOUD_REPOSITORY}/ubuntu/${dist}"
-    if test -n "${DRY_RUN-}"
+    if [[ -n "${DRY_RUN-}" ]]
     then
         echo "package_cloud push ${base} build-area/*.deb (dry-run)"
     else
@@ -268,7 +268,7 @@ fi
 # Check if we need to merge changes
 #
 
-if test -n "${git_tag}"
+if [[ -n "${git_tag}" ]]
 then
 
     remotes_file=.unique-remotes
@@ -302,7 +302,7 @@ EOF
                 head="${ref//^heads\//}"
                 echo " Head: ${head}"
 
-                if test "${head}" = "${tmpbranch}"
+                if [[ "${head}" == "${tmpbranch}" ]]
                 then
                     echo " Skipping merge of tag to temp branch's head ${head}"
                     continue
@@ -329,7 +329,7 @@ EOF
                 branch="${branch#*/}"
                 echo " Remote branch: ${branch}"
 
-                if test -z "${remote_name}"
+                if [[ -z "${remote_name}" ]]
                 then
                     continue # something went wrong ?
                 fi
@@ -343,7 +343,7 @@ EOF
                     echo "${push_to}" >>${remotes_file}
                 }
 
-                if test "${branch}" = "HEAD"
+                if [[ "${branch}" == "HEAD" ]]
                 then
                     echo " Skipping push to remote's HEAD"
                     continue
@@ -365,7 +365,7 @@ EOF
 
     while read -r push_to
     do
-        test -z "${push_to}" && continue # skip empty lines
+        [[ -z "${push_to}" ]] && continue # skip empty lines
         cat << EOF
 --------------------------------------------------
 Pushing tag ${git_tag} to '$(printurl "${push_to}")'
