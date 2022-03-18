@@ -4,7 +4,7 @@ set -o errexit -o noclobber -o nounset -o pipefail
 shopt -s failglob inherit_errexit
 
 printurl() {
-    if test -z "$1"
+    if [[ -z "${1-}" ]]
     then
         while read -r in
         do
@@ -16,7 +16,7 @@ printurl() {
 }
 
 redact() {
-    if test -z "$1"
+    if [[ -z "${1-}" ]]
     then
         echo -n
     else
@@ -29,16 +29,16 @@ cat << EOF
 LINZ Software Packaging system
 
 Supported Environment Variables:
-   PACKAGECLOUD_REPOSITORY [${PACKAGECLOUD_REPOSITORY}]
+   PACKAGECLOUD_REPOSITORY [${PACKAGECLOUD_REPOSITORY-}]
       Packagecloud repository to push packages to.
       Can be 'test', 'dev' or empty (default)
       for not publishing them at all.
       Targetting 'test' also creates a debian tag
       and pushes changes to determined git remote
-   PACKAGECLOUD_TOKEN [$(redact "${PACKAGECLOUD_TOKEN}")]
+   PACKAGECLOUD_TOKEN [$(redact "${PACKAGECLOUD_TOKEN-}")]
       Token to authorize publishing to packagecloud.
       Only needed if PACKAGECLOUD_REPOSITORY is not empty.
-   PUSH_TO_GIT_REMOTE [$(printurl "${PUSH_TO_GIT_REMOTE}")]
+   PUSH_TO_GIT_REMOTE [$(printurl "${PUSH_TO_GIT_REMOTE-}")]
       Git remote name or URL to push debian tag and
       changes to, if PACKAGECLOUD_REPOSITORY=test.
       Defaults to the remotes pointing at HEAD ref.
@@ -184,8 +184,7 @@ cat << 'EOF'
 Running deb-build-binary
 ------------------------------
 EOF
-if test "${PACKAGECLOUD_REPOSITORY}" = "test" -o \
-    "${PACKAGECLOUD_REPOSITORY}" = "private-test"
+if [[ "${PACKAGECLOUD_REPOSITORY-}" == "test" ]] || [[ "${PACKAGECLOUD_REPOSITORY-}" == "private-test" ]]
 then
     deb_build_binary_args=(--git-tag)
 fi
@@ -226,7 +225,7 @@ ls -l build-area/*.deb
 # Check if we need to publish
 #
 
-if test -n "${PACKAGECLOUD_REPOSITORY}"
+if [[ -n "${PACKAGECLOUD_REPOSITORY-}" ]]
 then
 
 cat << EOF
@@ -255,7 +254,7 @@ EOF
     then
         echo "package_cloud push ${base} build-area/*.deb (dry-run)"
     else
-        if test -z "${PACKAGECLOUD_TOKEN}"
+        if [[ -z "${PACKAGECLOUD_TOKEN-}" ]]
         then
             echo "Cannot publish to packages without a PACKAGECLOUD_TOKEN" >&2
             exit 1
@@ -275,7 +274,7 @@ then
     remotes_file=.unique-remotes
 
     : >${remotes_file}
-    if test -n "${PUSH_TO_GIT_REMOTE}"
+    if [[ -n "${PUSH_TO_GIT_REMOTE-}" ]]
     then
         echo "${PUSH_TO_GIT_REMOTE}" >>${remotes_file}
     fi
