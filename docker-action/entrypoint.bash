@@ -4,7 +4,7 @@ set -o errexit -o noclobber -o nounset -o pipefail
 shopt -s failglob inherit_errexit
 
 printurl() {
-    if test -z "$1"
+    if [[ -z "${1-}" ]]
     then
         while read -r in
         do
@@ -16,7 +16,7 @@ printurl() {
 }
 
 redact() {
-    if test -z "$1"
+    if [[ -z "${1-}" ]]
     then
         echo -n
     else
@@ -29,16 +29,16 @@ cat << EOF
 LINZ Software Packaging system
 
 Supported Environment Variables:
-   PACKAGECLOUD_REPOSITORY [${PACKAGECLOUD_REPOSITORY}]
+   PACKAGECLOUD_REPOSITORY [${PACKAGECLOUD_REPOSITORY-}]
       Packagecloud repository to push packages to.
       Can be 'test', 'dev' or empty (default)
       for not publishing them at all.
       Targetting 'test' also creates a debian tag
       and pushes changes to determined git remote
-   PACKAGECLOUD_TOKEN [$(redact "${PACKAGECLOUD_TOKEN}")]
+   PACKAGECLOUD_TOKEN [$(redact "${PACKAGECLOUD_TOKEN-}")]
       Token to authorize publishing to packagecloud.
       Only needed if PACKAGECLOUD_REPOSITORY is not empty.
-   PUSH_TO_GIT_REMOTE [$(printurl "${PUSH_TO_GIT_REMOTE}")]
+   PUSH_TO_GIT_REMOTE [$(printurl "${PUSH_TO_GIT_REMOTE-}")]
       Git remote name or URL to push debian tag and
       changes to, if PACKAGECLOUD_REPOSITORY=test.
       Defaults to the remotes pointing at HEAD ref.
@@ -51,7 +51,7 @@ EOF
 
 cd /pkg
 
-if test -n "${DRY_RUN-}"
+if [[ -n "${DRY_RUN-}" ]]
 then
     git_dry_run=(--dry-run)
 fi
@@ -68,7 +68,7 @@ cleanup() {
  ----------------
 EOF
 
-    if test -n "${DRY_RUN-}" -a -n "${git_tag-}"
+    if [[ -n "${DRY_RUN-}" ]] && [[ -n "${git_tag-}" ]]
     then
         cat << 'EOF'
 --------------------------------------------------
@@ -184,8 +184,7 @@ cat << 'EOF'
 Running deb-build-binary
 ------------------------------
 EOF
-if test "${PACKAGECLOUD_REPOSITORY}" = "test" -o \
-    "${PACKAGECLOUD_REPOSITORY}" = "private-test"
+if [[ "${PACKAGECLOUD_REPOSITORY-}" == "test" ]] || [[ "${PACKAGECLOUD_REPOSITORY-}" == "private-test" ]]
 then
     deb_build_binary_args=(--git-tag)
 fi
@@ -209,7 +208,7 @@ git_tag=$(
     grep 'Tagging Debian package .* as debian/' "$log_file" |
         sed 's@.* as debian/@debian/@;s@ in git$@@' || [[ $? -eq 1 ]]
 )
-if test -n "${git_tag}"
+if [[ -n "${git_tag}" ]]
 then
     echo "GIT TAG ${git_tag} created"
 fi
@@ -226,10 +225,10 @@ ls -l build-area/*.deb
 # Check if we need to publish
 #
 
-if test -n "${PACKAGECLOUD_REPOSITORY}"
+if [[ -n "${PACKAGECLOUD_REPOSITORY-}" ]]
 then
 
-cat << EOF
+    cat << EOF
 --------------------------------------------------
 Publishing packages to packagecloud ${PACKAGECLOUD_REPOSITORY}
 --------------------------------------------------
@@ -251,11 +250,11 @@ EOF
             ;;
     esac
     base="linz/${PACKAGECLOUD_REPOSITORY}/ubuntu/${dist}"
-    if test -n "${DRY_RUN-}"
+    if [[ -n "${DRY_RUN-}" ]]
     then
         echo "package_cloud push ${base} build-area/*.deb (dry-run)"
     else
-        if test -z "${PACKAGECLOUD_TOKEN}"
+        if [[ -z "${PACKAGECLOUD_TOKEN-}" ]]
         then
             echo "Cannot publish to packages without a PACKAGECLOUD_TOKEN" >&2
             exit 1
@@ -269,13 +268,13 @@ fi
 # Check if we need to merge changes
 #
 
-if test -n "${git_tag}"
+if [[ -n "${git_tag}" ]]
 then
 
     remotes_file=.unique-remotes
 
     : >${remotes_file}
-    if test -n "${PUSH_TO_GIT_REMOTE}"
+    if [[ -n "${PUSH_TO_GIT_REMOTE-}" ]]
     then
         echo "${PUSH_TO_GIT_REMOTE}" >>${remotes_file}
     fi
@@ -303,7 +302,7 @@ EOF
                 head="${ref//^heads\//}"
                 echo " Head: ${head}"
 
-                if test "${head}" = "${tmpbranch}"
+                if [[ "${head}" == "${tmpbranch}" ]]
                 then
                     echo " Skipping merge of tag to temp branch's head ${head}"
                     continue
@@ -330,7 +329,7 @@ EOF
                 branch="${branch#*/}"
                 echo " Remote branch: ${branch}"
 
-                if test -z "${remote_name}"
+                if [[ -z "${remote_name}" ]]
                 then
                     continue # something went wrong ?
                 fi
@@ -344,7 +343,7 @@ EOF
                     echo "${push_to}" >>${remotes_file}
                 }
 
-                if test "${branch}" = "HEAD"
+                if [[ "${branch}" == "HEAD" ]]
                 then
                     echo " Skipping push to remote's HEAD"
                     continue
@@ -366,7 +365,7 @@ EOF
 
     while read -r push_to
     do
-        test -z "${push_to}" && continue # skip empty lines
+        [[ -z "${push_to}" ]] && continue # skip empty lines
         cat << EOF
 --------------------------------------------------
 Pushing tag ${git_tag} to '$(printurl "${push_to}")'
