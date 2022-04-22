@@ -11,8 +11,8 @@ after using a checkout action. For example:
 
 ```yaml
 steps:
-  - uses: actions/checkout@v2.4.0
-  - uses: linz/linz-software-repository@v5
+  - uses: actions/checkout@v3
+  - uses: linz/linz-software-repository@v11
 ```
 
 The default action only builds the packages.
@@ -21,8 +21,8 @@ If you want to also publish packages to packagecloud you'll need to pass appropr
 
 ```yaml
 steps:
-  - uses: actions/checkout@v2.4.0
-  - uses: linz/linz-software-repository@v5
+  - uses: actions/checkout@v3
+  - uses: linz/linz-software-repository@v11
     with:
       packagecloud_repository: 'dev'
       packagecloud_token: ${{ secrets.PACKAGECLOUD_TOKEN }}
@@ -37,12 +37,12 @@ checked out depends on the action triggering the event). Protected branches can 
 
 ```yaml
 steps:
-  - uses: actions/checkout@v2.4.0
+  - uses: actions/checkout@v3
   - name: Authorize pushing to remote
     run:
       git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN
       }}@github.com/${GITHUB_REPOSITORY}
-  - uses: linz/linz-software-repository@v5
+  - uses: linz/linz-software-repository@v11
     with:
       packagecloud_repository: 'test'
       packagecloud_token: ${{ secrets.PACKAGECLOUD_TOKEN }}
