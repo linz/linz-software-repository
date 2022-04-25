@@ -68,3 +68,15 @@ jobs:
         run:
           nix-shell --pure --run 'docker run --entrypoint=bash linz-deb-builder -o pipefail -c
           "python3 -c \"print(\\\"Toitū Te Whenua LINZ\\\")\" | /usr/games/cowthink"'
+
+  finalise:
+    if: always()
+    needs:
+      - lint
+      - test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decide whether the needed jobs succeeded or failed
+        uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}
