@@ -48,6 +48,8 @@ RUN curl https://packagecloud.io/install/repositories/linz/test/script.deb.sh | 
 RUN curl https://packagecloud.io/install/repositories/linz/prod/script.deb.sh | \
     os=ubuntu dist=focal bash
 
+RUN git config --global --add safe.directory /pkg
+
 COPY Gemfile Gemfile.lock /tmp/
 RUN gem install bundler:2.3.6 \
     && bundle install --gemfile=/tmp/Gemfile
