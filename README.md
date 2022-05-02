@@ -68,6 +68,7 @@ Using the above, how do you actually release? If you want to release a release:
 1. Wait for the pull request to build.
 1. Tag the final commit on the branch with `X.Y.Z`, for example, `1.10.2`.
 1. `git push origin TAG` with the tag created above.
+1. Verify that all the release jobs succeed.
 1. Wait for the package to appear in the [test repository](https://packagecloud.io/linz/test).
 1. Manually promote the package from the test repository to production.
 1. Wait for the pull request to build with the Debian packaging changelog commit and merge it.
