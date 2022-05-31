@@ -44,9 +44,9 @@ RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg m
     > /etc/apt/sources.list.d/pgdg.list
 
 RUN curl https://packagecloud.io/install/repositories/linz/test/script.deb.sh | \
-    os=ubuntu dist=jammy bash
+    os=ubuntu dist=focal bash
 RUN curl https://packagecloud.io/install/repositories/linz/prod/script.deb.sh | \
-    os=ubuntu dist=jammy bash
+    os=ubuntu dist=focal bash
 
 RUN git config --global --add safe.directory /pkg
 
