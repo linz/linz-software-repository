@@ -36,6 +36,16 @@ checked out depends on the action triggering the event). Protected branches can 
     }}@github.com/${GITHUB_REPOSITORY}
 ```
 
+## Manual test
+
+1. Build the builder container in this repository:
+   `nix-shell --pure --run 'docker build --tag=docker-builder .'`.
+1. Build the project:
+   `docker run --env=DRY_RUN=1 --env=GITHUB_REPOSITORY=GITHUB_REPOSITORY --env=RUNNER_WORKSPACE=WORKSPACE --volume=/var/run/docker.sock:/var/run/docker.sock docker-builder RELEASE PACKAGES`
+   - [`GITHUB_REPOSITORY` is as defined in the docs](https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables)
+   - `WORKSPACE` is the _parent_ directory of the project
+   - The rest of the parameters are as shown in the [use example](#use)
+
 ## Release procedure
 
 Using the above, how do you actually release? If you want to release a release:
