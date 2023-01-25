@@ -6,27 +6,21 @@ GitHub action to build Ubuntu packages.
 
 ## Use
 
-If you want a GitHub workflow to take care of building packages you just need to use this action
-after using a checkout action. For example:
+See [`action.yml`](action.yml) for parameter definitions.
+
+Example:
 
 ```yaml
-steps:
-  - uses: actions/checkout@v3
-  - uses: linz/linz-software-repository@v11
+- name: Build package
+  uses: linz/linz-software-repository@vN
+  with:
+    release: jammy
+    packages: 'cowsay python3'
+    packagecloud_repository: dev
+    packagecloud_token: ${{ secrets.PACKAGECLOUD_TOKEN }}
 ```
 
-The default action only builds the packages.
-
-If you want to also publish packages to packagecloud you'll need to pass appropriate parameters:
-
-```yaml
-steps:
-  - uses: actions/checkout@v3
-  - uses: linz/linz-software-repository@v11
-    with:
-      packagecloud_repository: 'dev'
-      packagecloud_token: ${{ secrets.PACKAGECLOUD_TOKEN }}
-```
+To build the package without publishing it, just remove the `packagecloud` parameters above.
 
 When publishing to the 'test' repository the action will also try to push changes to
 debian/changelog file back to the origin, together with a `debian/xxx` tag. In order for the action
@@ -36,17 +30,21 @@ branches containing the initial reference from the checked out repository (which
 checked out depends on the action triggering the event). Protected branches can get in your way!
 
 ```yaml
-steps:
-  - uses: actions/checkout@v3
-  - name: Authorize pushing to remote
-    run:
-      git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN
-      }}@github.com/${GITHUB_REPOSITORY}
-  - uses: linz/linz-software-repository@v11
-    with:
-      packagecloud_repository: 'test'
-      packagecloud_token: ${{ secrets.PACKAGECLOUD_TOKEN }}
+- name: Authorize pushing to remote
+  run:
+    git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN
+    }}@github.com/${GITHUB_REPOSITORY}
 ```
+
+## Manual test
+
+1. Build the builder container in this repository:
+   `nix-shell --pure --run 'docker build --tag=docker-builder .'`.
+1. Build the project:
+   `docker run --env=DRY_RUN=1 --env=GITHUB_REPOSITORY=GITHUB_REPOSITORY --env=RUNNER_WORKSPACE=WORKSPACE --volume=/var/run/docker.sock:/var/run/docker.sock docker-builder RELEASE PACKAGES`
+   - [`GITHUB_REPOSITORY` is as defined in the docs](https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables)
+   - `WORKSPACE` is the _parent_ directory of the project
+   - The rest of the parameters are as shown in the [use example](#use)
 
 ## Release procedure
 
