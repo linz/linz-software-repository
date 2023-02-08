@@ -26,12 +26,10 @@ jobs:
       fail-fast: false
       matrix:
         runner:
-          - ubuntu-18.04
           - ubuntu-20.04
           - ubuntu-22.04
           - ubuntu-latest
         release:
-          - bionic
           - focal
           - jammy
     env:
