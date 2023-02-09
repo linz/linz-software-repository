@@ -13,14 +13,6 @@ printurl() {
     fi
 }
 
-redact() {
-    if [[ -z "${1-}" ]]; then
-        echo -n
-    else
-        echo "<redacted>"
-    fi
-}
-
 cat << EOF
 ----------------------------------------------------
 LINZ Software Packaging system
@@ -32,7 +24,7 @@ Supported Environment Variables:
       for not publishing them at all.
       Targetting 'test' also creates a debian tag
       and pushes changes to determined git remote
-   PACKAGECLOUD_TOKEN [$(redact "${PACKAGECLOUD_TOKEN-}")]
+   PACKAGECLOUD_TOKEN [<redacted>]
       Token to authorize publishing to packagecloud.
       Only needed if PACKAGECLOUD_REPOSITORY is not empty.
    PUSH_TO_GIT_REMOTE [$(printurl "${PUSH_TO_GIT_REMOTE-}")]
