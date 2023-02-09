@@ -11,6 +11,9 @@
 #
 ################################################################################
 
+set -o errexit -o noclobber -o nounset -o pipefail
+shopt -s failglob inherit_errexit
+
 dist=$(lsb_release -cs)
 curbranch=$(git rev-parse --abbrev-ref HEAD)
 buildbranch=pkg-build-dist-$dist-$(date +%s)

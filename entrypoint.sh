@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -o errexit -o nounset
+set -o errexit -o noclobber -o nounset
 
 release="$1"
 packages="$2"
