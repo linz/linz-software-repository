@@ -32,9 +32,7 @@ git add debian/changelog
 git commit --message="Debian changelog update for package rebuild"
 
 gbp buildpackage \
-    -i.git -I.git \
     --git-export-dir=build-area \
-    --git-builder=debuild \
     --git-no-pristine-tar \
     --git-upstream-tag='%(version)s' \
     --git-ignore-branch \
