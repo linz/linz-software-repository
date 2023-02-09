@@ -19,5 +19,5 @@ test -f debian/control || {
 mk-build-deps \
     -i \
     -r \
-    -t 'apt-get -y --allow-unauthenticated' \
+    -t 'apt-get -y' \
     debian/control
