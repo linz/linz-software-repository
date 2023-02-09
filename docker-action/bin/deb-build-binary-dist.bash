@@ -14,7 +14,7 @@
 set -o errexit -o noclobber -o nounset -o pipefail
 shopt -s failglob inherit_errexit
 
-dist=$(lsb_release -cs)
+dist=$(lsb_release --codename --short)
 curbranch=$(git rev-parse --abbrev-ref HEAD)
 buildbranch=pkg-build-dist-$dist-$(date +%s)
 
@@ -29,7 +29,7 @@ dch \
     "Package rebuild for $dist"
 
 git add debian/changelog
-git commit -m "Debian changelog update for package rebuild"
+git commit --message="Debian changelog update for package rebuild"
 
 gbp buildpackage \
     -i.git -I.git \
@@ -43,4 +43,4 @@ gbp buildpackage \
     -b -us -uc
 
 git checkout "$curbranch"
-git branch -D "$buildbranch"
+git branch --delete --force "$buildbranch"

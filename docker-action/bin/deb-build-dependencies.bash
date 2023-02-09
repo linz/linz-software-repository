@@ -20,7 +20,7 @@ test -f debian/control || {
 }
 
 mk-build-deps \
-    -i \
-    -r \
-    -t 'apt-get -y' \
+    --install \
+    --remove \
+    --tool='apt-get --assume-yes' \
     debian/control
