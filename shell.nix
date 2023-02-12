@@ -19,6 +19,7 @@ pkgs.mkShell {
     pkgs.gnumake
     pkgs.nodejs
     pkgs.pre-commit
+    pkgs.shfmt
     pkgs.which
   ];
 }

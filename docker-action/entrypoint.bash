@@ -4,10 +4,8 @@ set -o errexit -o noclobber -o nounset -o pipefail
 shopt -s failglob inherit_errexit
 
 printurl() {
-    if [[ -z "${1-}" ]]
-    then
-        while read -r in
-        do
+    if [[ -z "${1-}" ]]; then
+        while read -r in; do
             printurl "${in}"
         done
     else
@@ -16,8 +14,7 @@ printurl() {
 }
 
 redact() {
-    if [[ -z "${1-}" ]]
-    then
+    if [[ -z "${1-}" ]]; then
         echo -n
     else
         echo "<redacted>"
@@ -51,8 +48,7 @@ EOF
 
 cd /pkg
 
-if [[ -n "${DRY_RUN-}" ]]
-then
+if [[ -n "${DRY_RUN-}" ]]; then
     git_dry_run=(--dry-run)
 fi
 
@@ -68,8 +64,7 @@ cleanup() {
  ----------------
 EOF
 
-    if [[ -n "${DRY_RUN-}" ]] && [[ -n "${git_tag-}" ]]
-    then
+    if [[ -n "${DRY_RUN-}" ]] && [[ -n "${git_tag-}" ]]; then
         cat << 'EOF'
 --------------------------------------------------
 Removing debian tag (dry run)
@@ -143,7 +138,7 @@ export DEBEMAIL="${last_committer_email}"
 git config --global user.email "${last_committer_email}"
 git config --global user.name "${last_committer_name}"
 
-msg="New version"                          #TODO: tweak this (take as param?)
+msg="New version" #TODO: tweak this (take as param?)
 last_version_tag="$(git describe --tags --match '[^d]*')"
 tag="${last_version_tag#v}"
 dist=$(lsb_release -cs)
@@ -184,16 +179,14 @@ cat << 'EOF'
 Running deb-build-binary
 ------------------------------
 EOF
-if [[ "${PACKAGECLOUD_REPOSITORY-}" == "test" ]] || [[ "${PACKAGECLOUD_REPOSITORY-}" == "private-test" ]]
-then
+if [[ "${PACKAGECLOUD_REPOSITORY-}" == "test" ]] || [[ "${PACKAGECLOUD_REPOSITORY-}" == "private-test" ]]; then
     deb_build_binary_args=(--git-tag)
 fi
 log_file='log.deb-build-binary.bash'
-if [[ -e "$log_file" ]]
-then
+if [[ -e "$log_file" ]]; then
     rm "$log_file"
 fi
-deb-build-binary.bash "${deb_build_binary_args[@]}" >"$log_file" ||
+deb-build-binary.bash "${deb_build_binary_args[@]}" > "$log_file" ||
     {
         cat "$log_file"
         exit 1
@@ -208,8 +201,7 @@ git_tag=$(
     grep 'Tagging Debian package .* as debian/' "$log_file" |
         sed 's@.* as debian/@debian/@;s@ in git$@@' || [[ $? -eq 1 ]]
 )
-if [[ -n "${git_tag}" ]]
-then
+if [[ -n "${git_tag}" ]]; then
     echo "GIT TAG ${git_tag} created"
 fi
 
@@ -225,8 +217,7 @@ ls -l build-area/*.deb
 # Check if we need to publish
 #
 
-if [[ -n "${PACKAGECLOUD_REPOSITORY-}" ]]
-then
+if [[ -n "${PACKAGECLOUD_REPOSITORY-}" ]]; then
 
     cat << EOF
 --------------------------------------------------
@@ -235,8 +226,8 @@ Publishing packages to packagecloud ${PACKAGECLOUD_REPOSITORY}
 EOF
 
     case "${PACKAGECLOUD_REPOSITORY}" in
-        dev | test | private-dev | private-test)
-            ;;
+        dev | test | private-dev | private-test) ;;
+
         *)
             cat << EOF >&2
 Invalid packagecloud repository ${PACKAGECLOUD_REPOSITORY}
@@ -250,12 +241,10 @@ EOF
             ;;
     esac
     base="linz/${PACKAGECLOUD_REPOSITORY}/ubuntu/${dist}"
-    if [[ -n "${DRY_RUN-}" ]]
-    then
+    if [[ -n "${DRY_RUN-}" ]]; then
         echo "package_cloud push ${base} build-area/*.deb (dry-run)"
     else
-        if [[ -z "${PACKAGECLOUD_TOKEN-}" ]]
-        then
+        if [[ -z "${PACKAGECLOUD_TOKEN-}" ]]; then
             echo "Cannot publish to packages without a PACKAGECLOUD_TOKEN" >&2
             exit 1
         fi
@@ -268,15 +257,13 @@ fi
 # Check if we need to merge changes
 #
 
-if [[ -n "${git_tag}" ]]
-then
+if [[ -n "${git_tag}" ]]; then
 
     remotes_file=.unique-remotes
 
-    : >${remotes_file}
-    if [[ -n "${PUSH_TO_GIT_REMOTE-}" ]]
-    then
-        echo "${PUSH_TO_GIT_REMOTE}" >>${remotes_file}
+    : > ${remotes_file}
+    if [[ -n "${PUSH_TO_GIT_REMOTE-}" ]]; then
+        echo "${PUSH_TO_GIT_REMOTE}" >> ${remotes_file}
     fi
 
     # git for-each-ref will return a format like:
@@ -287,11 +274,9 @@ then
     git for-each-ref --points-at "${start_hash}" \
         --format='%(refname:lstrip=1)' \
         refs/remotes/ refs/heads/ |
-        while read -r ref
-        do
+        while read -r ref; do
 
-            if expr "$ref" : heads/ >/dev/null
-            then
+            if expr "$ref" : heads/ > /dev/null; then
 
                 cat << EOF
 --------------------------------------------------
@@ -302,8 +287,7 @@ EOF
                 head="${ref//^heads\//}"
                 echo " Head: ${head}"
 
-                if [[ "${head}" == "${tmpbranch}" ]]
-                then
+                if [[ "${head}" == "${tmpbranch}" ]]; then
                     echo " Skipping merge of tag to temp branch's head ${head}"
                     continue
                 fi
@@ -312,8 +296,7 @@ EOF
                 echo "git push ${git_dry_run[*]} . '${tmpbranch}':'${head}'"
                 git push "${git_dry_run[@]}" . "${tmpbranch}":"${head}"
 
-            elif expr "$ref" : remotes/ >/dev/null
-            then
+            elif expr "$ref" : remotes/ > /dev/null; then
 
                 cat << EOF
 --------------------------------------------------
@@ -329,8 +312,7 @@ EOF
                 branch="${branch#*/}"
                 echo " Remote branch: ${branch}"
 
-                if [[ -z "${remote_name}" ]]
-                then
+                if [[ -z "${remote_name}" ]]; then
                     continue # something went wrong ?
                 fi
 
@@ -340,11 +322,10 @@ EOF
                 # Keep note of unique remote names for pushing tag
                 grep -qw "${push_to}" "${remotes_file}" || {
                     echo " Saving remote '$(printurl "${push_to}")' to ${remotes_file}"
-                    echo "${push_to}" >>${remotes_file}
+                    echo "${push_to}" >> ${remotes_file}
                 }
 
-                if [[ "${branch}" == "HEAD" ]]
-                then
+                if [[ "${branch}" == "HEAD" ]]; then
                     echo " Skipping push to remote's HEAD"
                     continue
                 fi
@@ -359,12 +340,11 @@ EOF
 
     cat << EOF
 --------------------------------------------------
-Remotes to push tag to: $(printurl <"${remotes_file}" | tr '\n' ' ')
+Remotes to push tag to: $(printurl < "${remotes_file}" | tr '\n' ' ')
 --------------------------------------------------
 EOF
 
-    while read -r push_to
-    do
+    while read -r push_to; do
         [[ -z "${push_to}" ]] && continue # skip empty lines
         cat << EOF
 --------------------------------------------------

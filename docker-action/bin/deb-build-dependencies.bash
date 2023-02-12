@@ -11,6 +11,9 @@
 #
 ################################################################################
 
+set -o errexit -o noclobber -o nounset -o pipefail
+shopt -s failglob inherit_errexit
+
 test -f debian/control || {
     echo "Cannot find debian/control file" >&2
     exit 1
