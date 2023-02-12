@@ -19,11 +19,8 @@ test -f debian/control || {
     exit 1
 }
 
-# TODO: Should this really be here ? I'd think NOT !
-apt-get --allow-unauthenticated update
-
 mk-build-deps \
     -i \
     -r \
-    -t 'apt-get -y --allow-unauthenticated' \
+    -t 'apt-get -y' \
     debian/control
