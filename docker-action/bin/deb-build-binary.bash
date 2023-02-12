@@ -11,6 +11,9 @@
 #
 ################################################################################
 
+set -o errexit -o noclobber -o nounset -o pipefail
+shopt -s failglob inherit_errexit
+
 gbp buildpackage \
     -i.git -I.git \
     --git-export-dir=build-area \
