@@ -12,14 +12,13 @@ let
 in
 pkgs.mkShell {
   packages = [
-    pkgs.cacert
-    pkgs.cargo
     pkgs.docker
     pkgs.gitFull
-    pkgs.gnumake
-    pkgs.nodejs
+    pkgs.hadolint
+    pkgs.nixpkgs-fmt
+    pkgs.nodePackages.prettier
     pkgs.pre-commit
+    pkgs.shellcheck
     pkgs.shfmt
-    pkgs.which
   ];
 }
