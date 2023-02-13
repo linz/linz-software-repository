@@ -1,4 +1,4 @@
-FROM docker:23.0.0-dind
+FROM docker:23.0.1-dind
 
 COPY entrypoint.sh /
 ENTRYPOINT ["/entrypoint.sh"]
