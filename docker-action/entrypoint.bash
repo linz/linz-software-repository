@@ -3,14 +3,10 @@
 set -o errexit -o noclobber -o nounset -o pipefail
 shopt -s failglob inherit_errexit
 
-printurl() {
-    if [[ -z "${1-}" ]]; then
-        while read -r in; do
-            printurl "${in}"
-        done
-    else
-        echo "${1//:\/\/[^:]*:[^@]*@/://<redacted>@}"
-    fi
+printurls() {
+    for url; do
+        echo "${url//:\/\/[^:]*:[^@]*@/://<redacted>@}"
+    done
 }
 
 cat << EOF
@@ -27,7 +23,7 @@ Supported Environment Variables:
    PACKAGECLOUD_TOKEN [<redacted>]
       Token to authorize publishing to packagecloud.
       Only needed if PACKAGECLOUD_REPOSITORY is not empty.
-   PUSH_TO_GIT_REMOTE [$(printurl "${PUSH_TO_GIT_REMOTE-}")]
+   PUSH_TO_GIT_REMOTE [$(printurls "${PUSH_TO_GIT_REMOTE-}")]
       Git remote name or URL to push debian tag and
       changes to, if PACKAGECLOUD_REPOSITORY=test.
       Defaults to the remotes pointing at HEAD ref.
@@ -250,12 +246,9 @@ fi
 #
 
 if [[ -n "${git_tag}" ]]; then
-
-    remotes_file=.unique-remotes
-
-    : > ${remotes_file}
+    remotes=()
     if [[ -n "${PUSH_TO_GIT_REMOTE-}" ]]; then
-        echo "${PUSH_TO_GIT_REMOTE}" >> ${remotes_file}
+        remotes+=("${PUSH_TO_GIT_REMOTE}")
     fi
 
     # git for-each-ref will return a format like:
@@ -263,88 +256,85 @@ if [[ -n "${git_tag}" ]]; then
     #   remotes/origin/all-remote-branches
     #   heads/all-remote-branches
     #
-    git for-each-ref --points-at "${start_hash}" \
-        --format='%(refname:lstrip=1)' \
-        refs/remotes/ refs/heads/ |
-        while read -r ref; do
+    while read -r -u3 ref; do
 
-            if expr "$ref" : heads/ > /dev/null; then
+        if expr "$ref" : heads/ > /dev/null; then
 
-                cat << EOF
+            cat << EOF
 --------------------------------------------------
 Head ref pointing at start hash: ${ref}
 --------------------------------------------------
 EOF
 
-                head="${ref//^heads\//}"
-                echo " Head: ${head}"
+            head="${ref//^heads\//}"
+            echo " Head: ${head}"
 
-                if [[ "${head}" == "${tmpbranch}" ]]; then
-                    echo " Skipping merge of tag to temp branch's head ${head}"
-                    continue
-                fi
+            if [[ "${head}" == "${tmpbranch}" ]]; then
+                echo " Skipping merge of tag to temp branch's head ${head}"
+                continue
+            fi
 
-                echo " Merging temporary branch to head '${head}'"
-                echo "git push ${git_dry_run[*]} . '${tmpbranch}':'${head}'"
-                git push "${git_dry_run[@]}" . "${tmpbranch}":"${head}"
+            echo " Merging temporary branch to head '${head}'"
+            echo "git push ${git_dry_run[*]} . '${tmpbranch}':'${head}'"
+            git push "${git_dry_run[@]}" . "${tmpbranch}":"${head}"
 
-            elif expr "$ref" : remotes/ > /dev/null; then
+        elif expr "$ref" : remotes/ > /dev/null; then
 
-                cat << EOF
+            cat << EOF
 --------------------------------------------------
 Remote ref pointing at start hash: ${ref}
 --------------------------------------------------
 EOF
 
-                remote_name="${ref#*/}"
-                remote_name="${remote_name%%/*}"
-                echo " Remote name: ${remote_name}"
+            remote_name="${ref#*/}"
+            remote_name="${remote_name%%/*}"
+            echo " Remote name: ${remote_name}"
 
-                branch="${ref#*/}"
-                branch="${branch#*/}"
-                echo " Remote branch: ${branch}"
+            branch="${ref#*/}"
+            branch="${branch#*/}"
+            echo " Remote branch: ${branch}"
 
-                if [[ -z "${remote_name}" ]]; then
-                    continue # something went wrong ?
-                fi
-
-                push_to=${PUSH_TO_GIT_REMOTE:-${remote_name}}
-                echo " Remote to push to: $(printurl "${push_to}")"
-
-                # Keep note of unique remote names for pushing tag
-                grep -qw "${push_to}" "${remotes_file}" || {
-                    echo " Saving remote '$(printurl "${push_to}")' to ${remotes_file}"
-                    echo "${push_to}" >> ${remotes_file}
-                }
-
-                if [[ "${branch}" == "HEAD" ]]; then
-                    echo " Skipping push to remote's HEAD"
-                    continue
-                fi
-
-                echo "  Pushing debian changes to branch ${branch} of remote $(printurl "${push_to}")"
-                git push "${git_dry_run[@]}" "${push_to}" "${tmpbranch}:${branch}"
-
+            if [[ -z "${remote_name}" ]]; then
+                continue # something went wrong ?
             fi
-            # is a remote ref
 
-        done
+            push_to=${PUSH_TO_GIT_REMOTE:-${remote_name}}
+            echo " Remote to push to: $(printurls "${push_to}")"
+
+            # Keep note of unique remote names for pushing tag
+            if ! [[ " ${remotes[*]} " =~ \ ${push_to}\  ]]; then
+                echo " Saving remote '$(printurls "${push_to}")'"
+                remotes+=("${push_to}")
+            fi
+
+            if [[ "${branch}" == "HEAD" ]]; then
+                echo " Skipping push to remote's HEAD"
+                continue
+            fi
+
+            echo "  Pushing debian changes to branch ${branch} of remote $(printurls "${push_to}")"
+            git push "${git_dry_run[@]}" "${push_to}" "${tmpbranch}:${branch}"
+
+        fi
+        # is a remote ref
+
+    done 3< <(git for-each-ref --points-at "${start_hash}" --format='%(refname:lstrip=1)' refs/remotes/ refs/heads/)
 
     cat << EOF
 --------------------------------------------------
-Remotes to push tag to: $(printurl < "${remotes_file}" | tr '\n' ' ')
+Remotes to push tag to: $(printurls "${remotes[@]}" | tr '\n' ' ')
 --------------------------------------------------
 EOF
 
-    while read -r push_to; do
+    for push_to in "${remotes[@]}"; do
         [[ -z "${push_to}" ]] && continue # skip empty lines
         cat << EOF
 --------------------------------------------------
-Pushing tag ${git_tag} to '$(printurl "${push_to}")'
+Pushing tag ${git_tag} to '$(printurls "${push_to}")'
 --------------------------------------------------
-git push ${git_dry_run[*]} "$(printurl "${push_to}")" ${git_tag}:${git_tag}
+git push ${git_dry_run[*]} "$(printurls "${push_to}")" ${git_tag}:${git_tag}
 EOF
         git push "${git_dry_run[@]}" "${push_to}" "${git_tag}:${git_tag}"
-    done < "${remotes_file}"
+    done
 
 fi
