@@ -16,7 +16,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4.1.5
       - name: Install Nix
-        uses: cachix/install-nix-action@v26
+        uses: cachix/install-nix-action@V27
       - name: Run pre-commit hooks
         run: nix-shell --pure --run 'pre-commit run --all-files'
 
@@ -40,7 +40,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install Nix
-        uses: cachix/install-nix-action@v26
+        uses: cachix/install-nix-action@V27
 
       - name: Build builder image
         run: nix-shell --pure --run 'docker build --tag=docker-builder .'
