@@ -5,13 +5,23 @@ updates:
     directory: /docker-action
     schedule:
       interval: daily
+    cooldown:
+      default-days: 15
   - package-ecosystem: docker
     directory: /
     schedule:
       interval: daily
+    cooldown:
+      default-days: 15
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: daily
     commit-message:
       prefix: build(deps)
+    ignore:
+      - dependency-name: pkg:localrepo/localrepo/local?repository_url=target
+      - dependency-name: pkg:localrepo/localrepo/local?repository_url=target
+      - dependency-name: pkg:localrepo/localrepo/local?repository_url=target
+    cooldown:
+      default-days: 15
